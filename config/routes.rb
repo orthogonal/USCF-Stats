@@ -1,4 +1,7 @@
 Uscfstats::Application.routes.draw do
+  
+  match "test/tournaments", :to => "test_noko#tournaments"
+  
   root :to => "test_noko#index"
 
   # The priority is based upon order of creation:

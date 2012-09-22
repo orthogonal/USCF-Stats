@@ -1,0 +1,9 @@
+<h1>Tournaments</h1>
+<table>
+<% for i in 0...(@tournaments.length) do %>
+	<tr>
+		<td><%=@tournaments[i]%></td>
+		<td><%=@sections[i]%></td>
+	</tr>
+<% end %>
+</table>
