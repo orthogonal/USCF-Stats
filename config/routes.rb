@@ -1,4 +1,6 @@
 Uscfstats::Application.routes.draw do
+  root :to => "test_noko#index"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
