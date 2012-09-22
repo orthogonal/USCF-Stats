@@ -1,0 +1,7 @@
+This is a Ruby on Rails application that will mine the United States Chess Federation website for data and present it.
+
+When I was a more serious chess player, I would always do things like this for myself.  I kept meticulous records of all my games and would keep track of how I did under various circumstances against various people, look at my trends, and try to use them to understand myself better.  I reveled in my biggest upsets and best performances while being upset by my worst losses.  I compared myself to my friends and rivals using various criteria and invented goals for myself.
+
+I am hoping to apply these same ideas and experiences to build an app that a lot of people can use.
+
+9/22:  Initiated project.
