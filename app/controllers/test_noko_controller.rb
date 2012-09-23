@@ -27,7 +27,7 @@ class TestNokoController < ApplicationController
     render(:action => "index")
   end
   
-  def tournaments
+  def opponents
     agent = Mechanize.new
     @tournaments = Array.new
     @sections = Array.new
@@ -57,12 +57,26 @@ class TestNokoController < ApplicationController
         link = block.at_css("a")
         if (link != nil)
           section = block.at_css("small")
-          @tournaments << link.text
-          @sections << section.text
+          @tournaments << link.attributes()["href"].to_s
+          @sections << section.text.scan(/\d+/).first.to_i
         end
       end
     end
     
-    render(:action => "tournaments")
+    @opponents = Array.new
+    
+    # For each tournament, go to the URL that shows who Doc played in that tournament, and scrape up the names of the players.
+    for i in 0...(@tournaments.length)
+      url = "http://main.uschess.org/assets/msa_joomla/#{@tournaments[i].gsub("XtblMain", "XtblPlr")[0, @tournaments[i].rindex('-')]}%03d-#{id}" % @sections[i]
+      puts "URL: #{url}"
+      doc = Nokogiri::HTML(open(url))
+      links = doc.search("td:nth-child(5) a")
+      links.each do |link|
+        @opponents << link.text
+      end
+      @opponents.uniq!  # Removes duplicates in-place
+    end
+    
+    render(:action => "opponents")
   end
 end

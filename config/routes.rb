@@ -1,6 +1,6 @@
 Uscfstats::Application.routes.draw do
   
-  match "test/tournaments", :to => "test_noko#tournaments"
+  match "test/opponents", :to => "test_noko#opponents"
   
   root :to => "test_noko#index"
 
