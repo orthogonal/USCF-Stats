@@ -1,1 +1,11 @@
-<%= test %>
+<table><tr><td>Name</td><td>Regular</td><td>Quick</td>
+<% if !(@opponents.nil?) %>
+	<% for i in 0...@opponents.length %>
+	<tr>
+		<td><%= @opponents[i][:name] %>: </td>
+		<td><%= (@opponents[i][:regular] != 0) ? @opponents[i][:regular] : "Unr." %></td>
+		<td><%= (@opponents[i][:quick] != 0) ? @opponents[i][:quick] : "Unr." %></td>
+	</tr>
+<% end %>
+</table>
+<% end %>

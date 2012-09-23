@@ -1,16 +1,19 @@
 <h1>USCF Stats</h1>
+<h3>By Andrew Latham</h3>
 
-<%= form_tag({}, {:id => "testlink"}) do %>
+<%= form_tag({}, {:id => "id_search"}) do %>
+	USCF ID: <%= text_field_tag "uscf_id" %>
     <%= submit_tag "Go" %>
 <% end %>
 
-<div id="test"><%= render(:partial => 'test', :locals => {:test => @test}) %></div>
+<div id="test"><%= render(:partial => 'test', :locals => {:opponents => nil}) %></div>
 
 <script>
-$('#testlink').click(function(){
+$('#id_search').submit(function(){
    $.ajax({
       type : 'GET',
       url : '/go',
+	  data: {uscf_id: $("#uscf_id").val()},
       dataType : 'script'
    });
    return false;
