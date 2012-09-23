@@ -2,8 +2,18 @@ class TestNokoController < ApplicationController
   require 'open-uri'
   require 'nokogiri'
   require 'mechanize'
+  require 'uscfwebsite'
   
+  def setup
+    @names = Array.new
+    @ratings = Array.new
+    @tournaments = Array.new
+    @sections = Array.new
+    @opponents = Array.new
+  end
+    
   def index
+    setup()
     doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrLst.php?latham"))
     list = doc.at_css("pre").inner_html
     firstNumber = list.index(/\d/)
@@ -11,7 +21,6 @@ class TestNokoController < ApplicationController
     
     # Get all the ratings by splitting on <a> tag elements and then sub-splitting on spaces.  Spaces are consistent.
     infos = list.split(/<a[^>]*>[^<]*<\/a>/)[0...-1]    # There will be a nil element at the end because of how the USCF website is built
-    @ratings = Array.new
     infos.each do |info| 
       @ratings << info.split(' ')[3].strip
     end
@@ -19,7 +28,6 @@ class TestNokoController < ApplicationController
     # Get all the names by getting just <a> tag elements and then killing off the actual tags to just get the content.
     names = list.scan(/<a[^>]*>[^<]*<\/a>/)
     puts names
-    @names = Array.new
     names.each do |name|
       @names << name.gsub(/<[^>]*>/, '').titleize.strip
     end
@@ -28,42 +36,16 @@ class TestNokoController < ApplicationController
   end
   
   def opponents
-    agent = Mechanize.new
-    @tournaments = Array.new
-    @sections = Array.new
-    
-    # Get a mechanize object representing the USCF members page, search for 'Cusick', and click on the link with Doc's name.
-    agent.get("http://main.uschess.org/assets/msa_joomla/MbrLst.php")
-    form = agent.page.form_with(:name => "form1")
-    form.eMbrKey = "cusick"
-    form.submit
+    setup()
+    agent = UscfWebsite.player_search_result("cusick")
     agent.page.link_with(:text => "CUSICK, MICHAEL ").click
     
     # Get my USCF ID from the URI and use it to go to Doc's tournament history
     url = agent.page.uri.to_s
-    id = url[url.index('?') + 1, url.length]
-    doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}"))
+    id = UscfWebsite.get_id_from_profile_url(url)
     
-    # Figure out how many pages of tournament records Doc has
-    pages = doc.search("nobr a")
-    pages = (pages.length != 0 ? pages.length : 1)
-    
-    # Go through each page, get all the blocks with tournament information and save the name and section Doc played in.
-    for i in 1...(pages + 1)
-      puts "i is #{i}"
-      if (i != 1) then doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}.#{i}")) end
-      blocks = doc.search("td:nth-child(2)")
-      blocks.each do |block|
-        link = block.at_css("a")
-        if (link != nil)
-          section = block.at_css("small")
-          @tournaments << link.attributes()["href"].to_s
-          @sections << section.text.scan(/\d+/).first.to_i
-        end
-      end
-    end
-    
-    @opponents = Array.new
+    UscfWebsite.get_tournaments(id, @tournaments, @sections)
+    puts "TOURNAMENTS: #{@tournaments}"
     
     # For each tournament, go to the URL that shows who Doc played in that tournament, and scrape up the names of the players.
     for i in 0...(@tournaments.length)
