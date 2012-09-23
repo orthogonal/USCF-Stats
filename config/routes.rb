@@ -1,8 +1,7 @@
 Uscfstats::Application.routes.draw do
   
-  match "test/opponents", :to => "test_noko#opponents"
-  
-  root :to => "test_noko#index"
+  root :to => "interface#index"
+  match "/go", :to => "interface#go"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

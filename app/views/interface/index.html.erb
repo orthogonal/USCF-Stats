@@ -1,0 +1,18 @@
+<h1>USCF Stats</h1>
+
+<%= form_tag({}, {:id => "testlink"}) do %>
+    <%= submit_tag "Go" %>
+<% end %>
+
+<div id="test"><%= render(:partial => 'test', :locals => {:test => @test}) %></div>
+
+<script>
+$('#testlink').click(function(){
+   $.ajax({
+      type : 'GET',
+      url : '/go',
+      dataType : 'script'
+   });
+   return false;
+});
+</script>
