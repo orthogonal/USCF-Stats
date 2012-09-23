@@ -37,6 +37,10 @@ class TestNokoController < ApplicationController
   
   def opponents
     setup()
+    ratings = UscfWebsite.get_published_ratings_from_id(14890336)
+    puts "REGULAR: #{ratings[:regular]}\nQUICK: #{ratings[:quick]}"
+    ratings = UscfWebsite.get_actual_ratings_from_id(14890336)
+    puts "REGULAR: #{ratings[:regular]}\nQUICK: #{ratings[:quick]}"
     agent = UscfWebsite.player_search_result("cusick")
     agent.page.link_with(:text => "CUSICK, MICHAEL ").click
     
