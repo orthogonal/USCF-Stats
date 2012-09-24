@@ -5,18 +5,18 @@ When I was a more serious chess player, I would always do things like this for m
 I am hoping to apply these same ideas and experiences to build an app that a lot of people can use.
 
 9/22:  
--Initiated project
--Learned about Nokogiri and Mechanize via RailsCasts
--Built web scraper to parse the USCF website and get data using regular expressions and CSS selectors
--Create UscfWebsite class to hold common methods for accessing the USCF website
+ -Initiated project
+ -Learned about Nokogiri and Mechanize via RailsCasts
+ -Built web scraper to parse the USCF website and get data using regular expressions and CSS selectors
+ -Create UscfWebsite class to hold common methods for accessing the USCF website
 9/23:
--Learned about Ajax in Rails (annoying because a lot changed in Rails 3.1 so all
+ -Learned about Ajax in Rails (annoying because a lot changed in Rails 3.1 so all
   the tutorials were outdated)
--Used instance variables in partials with Ajax calls to dynamically update the page using a Ruby object
--Wrote code to collect all the opponents someone has ever played and sort them by rating
--Made MySQL database, pushed project to Heroku, sorted out little bugs in transitioning
--Doing it all in one call caused Heroku to timeout for players with long histories, 
+ -Used instance variables in partials with Ajax calls to dynamically update the page using a Ruby object
+ -Wrote code to collect all the opponents someone has ever played and sort them by rating
+ -Made MySQL database, pushed project to Heroku, sorted out little bugs in transitioning
+ -Doing it all in one call caused Heroku to timeout for players with long histories, 
   so I went through and made the entire thing a collection of Ajax calls that pass JSON objects
   and arrays back and forth to collect all the data
--Added some jQuery to make the user interface a little more friendly and show a progress
+ -Added some jQuery to make the user interface a little more friendly and show a progress
   indicator with % complete and the date of the last tournament processed
