@@ -2,7 +2,7 @@ class InterfaceController < ApplicationController
   require 'open-uri'
   require 'nokogiri'
   require 'mechanize'
-  require 'uscfwebsite'
+  require 'UscfWebsite'
   
   def setup
     @tournaments = Array.new
