@@ -6,17 +6,18 @@
     <%= submit_tag "Go" %>
 <% end %>
 
-<div id="test"><%= render(:partial => 'test', :locals => {:opponents => nil}) %></div>
+<div id="test">Enter your USCF ID to see what happened to all the people you've played in your life</div>
 
 <script>
 $('#id_search').submit(function(){
+   $("#id_search").hide();
    $.ajax({
       type : 'GET',
       url : '/tournaments',
 	  data: {uscf_id: $("#uscf_id").val()},
       dataType : 'json',
 	  error: function(){
-		alert("There's an error!");
+		alert("There's an error!  e-mail acl68@case.edu");
 	  },
 	  success : function(data){
 		console.log(data);
@@ -31,12 +32,16 @@ $('#id_search').submit(function(){
 				data: {url: data[i]},
 				dataType: 'json',
 				error: function(){
-					alert("There's an error!");
+					alert("There's an error!  e-mail acl68@case.edu");
 				},
 				success: function(data2){
 					++j;
-					opponents = opponents.concat(data2)
-					console.log("J: " + j + "/" + numTournaments);
+					date = data2[0].date;
+					date = date.substring(4, 6) + "/" + date.substring(6, 8) + "/" + date.substring(0, 4);
+					data2.splice(0, 1);
+					opponents = opponents.concat(data2);
+					$("#test").html("Crawling the USCF website for your tournament data and your opponent's profiles<br />Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />"
+						+ "Last date processed: " + date);
 					if (j == numTournaments){
 						$.ajax({
 						      type : 'POST',

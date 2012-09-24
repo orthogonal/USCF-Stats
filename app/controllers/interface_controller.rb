@@ -44,6 +44,7 @@ class InterfaceController < ApplicationController
     end
     @opponents.uniq!  # Removes duplicates in-place
     @opponents.sort_by!{|item| -item[:regular]}
+    @opponents.unshift({:date => url[url.index("?") + 1, url.index("?") + 9]})
     respond_to do |format|
       format.json {render :js => @opponents.to_json}
     end
