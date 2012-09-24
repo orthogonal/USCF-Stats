@@ -1,16 +1,17 @@
-<h1>USCF Stats</h1>
-<h3>By Andrew Latham</h3>
+<h1>Where did they end up?</h1>
+<h3>By <a href="mailto:acl68@case.edu">Andrew Latham</a></h3>
 
 <%= form_tag({}, {:id => "id_search"}) do %>
 	USCF ID: <%= text_field_tag "uscf_id" %>
     <%= submit_tag "Go" %>
 <% end %>
-
+<br />
 <div id="test">Enter your USCF ID to see what happened to all the people you've played in your life</div>
 
 <script>
 $('#id_search').submit(function(){
    $("#id_search").hide();
+   $("#test").html("Crawling the USCF website for your tournament data and your opponent's profiles");
    $.ajax({
       type : 'GET',
       url : '/tournaments',
@@ -40,7 +41,7 @@ $('#id_search').submit(function(){
 					date = date.substring(4, 6) + "/" + date.substring(6, 8) + "/" + date.substring(0, 4);
 					data2.splice(0, 1);
 					opponents = opponents.concat(data2);
-					$("#test").html("Crawling the USCF website for your tournament data and your opponent's profiles<br />Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />"
+					$("#test").html("Crawling the USCF website for your tournament data and your opponents' profiles<br />Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />"
 						+ "Last date processed: " + date);
 					if (j == numTournaments){
 						$.ajax({
