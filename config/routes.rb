@@ -1,7 +1,10 @@
 Uscfstats::Application.routes.draw do
   
   root :to => "interface#index"
-  match "/go", :to => "interface#go"
+  match "/complete", :to => "interface#complete"
+  match "/tournaments", :to => "interface#tournaments"
+  match "/from_tournament", :to => "interface#from_tournament"
+  match "/complete", :to => "interface#complete"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

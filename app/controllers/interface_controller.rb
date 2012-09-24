@@ -3,6 +3,7 @@ class InterfaceController < ApplicationController
   require 'nokogiri'
   require 'mechanize'
   require 'UscfWebsite'
+  require 'json'
   
   def setup
     @tournaments = Array.new
@@ -15,25 +16,46 @@ class InterfaceController < ApplicationController
     render(:action => "index")
   end
   
-  def go
+  def tournaments
     setup()
     id = params[:uscf_id]
     UscfWebsite.get_tournaments(id, @tournaments, @sections)
-
-    # For each tournament, go to the URL that shows who Doc played in that tournament, and scrape up the names of the players.
+    obj = {:num => @tournaments.length}
     for i in 0...(@tournaments.length)
       url = "http://main.uschess.org/assets/msa_joomla/#{@tournaments[i].gsub("XtblMain", "XtblPlr")[0, @tournaments[i].rindex('-')]}%03d-#{id}" % @sections[i]
-      puts "URL: #{url}"
-      doc = Nokogiri::HTML(open(url))
-      links = doc.search("td:nth-child(5) a")
-      links.each do |link|
-        oppId = link.attr("href")[link.attr("href").index('?') + 1, link.attr("href").length]
-        ratings = UscfWebsite.get_actual_ratings_from_id(oppId)
-        @opponents << {:name => link.text, :id => oppId, :regular => ratings[:regular], :quick => ratings[:quick]}
-      end
-      @opponents.uniq!  # Removes duplicates in-place
-      @opponents.sort_by!{|item| -item[:regular]}
+      obj.merge! i => url
     end
+    puts obj
+    respond_to do |format|
+        format.json { render :js => obj.to_json}
+    end
+  end
+  
+  def from_tournament
+    setup()
+    url = params[:url]
+    puts "URL: #{url}"
+    doc = Nokogiri::HTML(open(url))
+    links = doc.search("td:nth-child(5) a")
+    links.each do |link|
+      oppId = link.attr("href")[link.attr("href").index('?') + 1, link.attr("href").length]
+      ratings = UscfWebsite.get_actual_ratings_from_id(oppId)
+      @opponents << {:name => link.text, :id => oppId, :regular => ratings[:regular], :quick => ratings[:quick]}
+    end
+    @opponents.uniq!  # Removes duplicates in-place
+    @opponents.sort_by!{|item| -item[:regular]}
+    respond_to do |format|
+      format.json {render :js => @opponents.to_json}
+    end
+  end
+  
+  def complete
+    setup()
+    stuff = params[:stuff].to_hash
+    @opponents = stuff.map{|key, value| value}
+    puts "OPPONENTS: #{@opponents}"
+    @opponents.uniq!
+    @opponents.sort_by!{|item| -item[:regular].to_i}
     
     respond_to do |format|
         format.js {}

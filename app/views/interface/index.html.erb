@@ -12,9 +12,43 @@
 $('#id_search').submit(function(){
    $.ajax({
       type : 'GET',
-      url : '/go',
+      url : '/tournaments',
 	  data: {uscf_id: $("#uscf_id").val()},
-      dataType : 'script'
+      dataType : 'json',
+	  error: function(){
+		alert("There's an error!");
+	  },
+	  success : function(data){
+		console.log(data);
+		numTournaments = data["num"];
+		opponents = []
+		j = 0;
+		stuff = {};
+		for (i = 0; i < numTournaments; i++){
+			$.ajax({
+				type : 'GET',
+				url: '/from_tournament',
+				data: {url: data[i]},
+				dataType: 'json',
+				error: function(){
+					alert("There's an error!");
+				},
+				success: function(data2){
+					++j;
+					opponents = opponents.concat(data2)
+					console.log("J: " + j + "/" + numTournaments);
+					if (j == numTournaments){
+						$.ajax({
+						      type : 'POST',
+						      url : '/complete',
+							  data : {stuff: opponents},
+						      dataType : 'script'
+						});
+					}
+				}
+			})
+		}
+	  }
    });
    return false;
 });
