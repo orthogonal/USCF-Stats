@@ -1,12 +1,26 @@
-<h1>Where did they end up?</h1>
-<h3>By <a href="mailto:acl68@case.edu">Andrew Latham</a></h3>
+<div id="top">
+	<div id="header">
+		<div id="title">USCF Stats</div>
+		<div id="subtext">
+			<span id="andrewLatham"><a href="mailto:acl68@case.edu">Andrew Latham</a></span>
+			<span id="comingSoon">Coming Soon</span>
+		</div>
+	</div>
+</div>
+<div id="information">
+<p>My name is Andrew Latham.  I am a computer science and mathematics major at Case Western, and a 2072-rated chess player.  This is a personal project of mine, and something I've always wanted to do.</p>
+<p>The USCF MSA is a goldmine of information.  The USCF does a few interesting things with this data, but there's so much more potential.  Exploring your extensive personal history and network of past opponents can lead to fascinating insights, many of which could improve your game.  It is my goal to help chess players achieve breakthroughs and realizations through statistical analysis of historical trends.  I am also planning on implementing machine learning algorithms based on the massive set of training examples the USCF makes available in order to provide more interesting information and analysis.</p>
+<p>I started working on this project on September 22, 2012.  It is open-source, and a log of recent updates is available at <a href="https://github.com/orthogonal/USCF-Stats">the project's GitHub page</a>.  If you have any ideas for information based on your chess history that you think would be interesting to see, <a href="mailto:acl68@case.edu">send me an e-mail</a> and I'll see what I can do!</p>
+<p>In the meantime, enjoy this example application I've put together.  This is a simple example of the kind of things that will be featured on this website.  Find your USCF ID by <a href="http://main.uschess.org/component/option,com_wrapper/Itemid,181/">searching the USCF database</a>, enter it below, and find out what the current ratings are of all the players you have ever played.</p>
 
-<%= form_tag({}, {:id => "id_search"}) do %>
-	USCF ID: <%= text_field_tag "uscf_id" %>
-    <%= submit_tag "Go" %>
-<% end %>
-<br />
-<div id="test">Enter your USCF ID to see what happened to all the people you've played in your life</div>
+<div id="beta">
+	<%= form_tag({}, {:id => "id_search"}) do %>
+		USCF ID: <%= text_field_tag "uscf_id" %>
+	    <%= submit_tag "Go" %>
+	<% end %>
+	<br />
+	<div id="test">Enter your USCF ID to see what happened to all the people you've ever played</div>
+</div>
 
 <script>
 $('#id_search').submit(function(){
@@ -42,7 +56,7 @@ $('#id_search').submit(function(){
 					data2.splice(0, 1);
 					opponents = opponents.concat(data2);
 					$("#test").html("Crawling the USCF website for your tournament data and your opponents' profiles<br />Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />"
-						+ "Last date processed: " + date);
+						+ "Tournament " + j + "/" + numTournaments + "<br />Last date processed: " + date);
 					if (j == numTournaments){
 						$.ajax({
 						      type : 'POST',

@@ -25,7 +25,6 @@ class InterfaceController < ApplicationController
       url = "http://main.uschess.org/assets/msa_joomla/#{@tournaments[i].gsub("XtblMain", "XtblPlr")[0, @tournaments[i].rindex('-')]}%03d-#{id}" % @sections[i]
       obj.merge! i => url
     end
-    puts obj
     respond_to do |format|
         format.json { render :js => obj.to_json}
     end
@@ -34,7 +33,6 @@ class InterfaceController < ApplicationController
   def from_tournament
     setup()
     url = params[:url]
-    puts "URL: #{url}"
     doc = Nokogiri::HTML(open(url))
     links = doc.search("td:nth-child(5) a")
     links.each do |link|
@@ -54,7 +52,6 @@ class InterfaceController < ApplicationController
     setup()
     stuff = params[:stuff].to_hash
     @opponents = stuff.map{|key, value| value}
-    puts "OPPONENTS: #{@opponents}"
     @opponents.uniq!
     @opponents.sort_by!{|item| -item[:regular].to_i}
     
