@@ -35,8 +35,17 @@ $('#id_search').submit(function(){
 		alert("There's an error!  e-mail acl68@case.edu");
 	  },
 	  success : function(data){
-		console.log(data);
+		if (!data){
+			$("#test").html("Invalid input");
+			$("#id_search").show();
+			return;
+		}
 		numTournaments = data["num"];
+		if (numTournaments == 0){
+			$("#test").html("That player has never played in a tournament");
+			$("#id_search").show();
+			return;
+		}
 		opponents = []
 		j = 0;
 		stuff = {};

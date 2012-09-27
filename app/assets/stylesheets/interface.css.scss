@@ -66,3 +66,18 @@ a{
 	box-pack:center;
 	box-align:center;
 }
+
+#beta form{
+	font-size: 18pt;
+}
+
+#beta input:nth-child(3){
+	-webkit-appearance: button;
+	font-size: 18pt;
+	border-radius: 2px 2px 2px 2px;
+}
+
+#beta #uscf_id{
+	width: 130px;
+	font-size: 18pt;
+}

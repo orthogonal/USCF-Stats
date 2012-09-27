@@ -18,7 +18,12 @@ class InterfaceController < ApplicationController
   
   def tournaments
     setup()
-    id = params[:uscf_id]
+    id = params[:uscf_id].strip
+    puts "Request with ID: #{id}"
+    if !(id.match(/\d{8}/))
+      render :js => ""
+      return
+    end
     UscfWebsite.get_tournaments(id, @tournaments, @sections)
     obj = {:num => @tournaments.length}
     for i in 0...(@tournaments.length)
