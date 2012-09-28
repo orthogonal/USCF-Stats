@@ -61,6 +61,39 @@ class UscfWebsite
     return ratings
   end
   
+  def self.get_rating_changes_from_tournament(uscf_id, tournament_id, section)
+    url = "http://main.uschess.org/assets/msa_joomla/XtblPlr.php?#{tournament_id}-%03d-#{uscf_id}" % section
+    doc = Nokogiri::HTML(open(url))
+    i = 0
+    tds = doc.search("td")
+    td = tds[i]
+    while (td.text.downcase.index("rating") == nil || td.text.downcase.index("rating") > 5) do
+      i += 1
+      td = tds[i]
+    end
+    changes = td.next_element.next_element
+    puts changes.text
+    rc = {:regular => nil, :quick => nil}
+    if (changes.text.index("R:") != -1)
+      regular_bit = changes.text.scan(/R:\s+\d+\D+\d+/).first
+      blocks = regular_bit.scan(/\d+/)
+      pre = blocks[0]
+      post = blocks[1]
+      rc[:regular] = {:pre => pre, :post => post}
+    end
+    if (changes.text.index("Q:") != -1)
+      regular_bit = changes.text.scan(/Q:\s+\d+\D+\d+/).first
+      blocks = regular_bit.scan(/\d+/)
+      pre = blocks[0]
+      post = blocks[1]
+      rc[:quick] = {:pre => pre, :post => post}
+    end
+    puts rc
+    return rc
+  end
+      
+    
+  
   def self.get_actual_ratings_from_id(id)
     doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}"))
     ratings = {:regular => 0, :quick => 0}
@@ -89,4 +122,5 @@ class UscfWebsite
     end
     return ratings
   end
+    
 end
