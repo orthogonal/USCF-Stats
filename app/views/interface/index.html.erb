@@ -16,7 +16,11 @@
 <div id="beta">
 	<%= form_tag({}, {:id => "id_search"}) do %>
 		USCF ID: <%= text_field_tag "uscf_id" %>
-	    <%= submit_tag "Go" %>
+		<%= submit_tag "Go" %>
+		<div id="options">
+		    <%= radio_button_tag 'type', 'regular', true %> Regular
+		    <%= radio_button_tag 'type', 'quick' %> Quick
+		</div>
 	<% end %>
 	<br />
 	<div id="test">Enter your USCF ID to see what happened to all the people you've ever played</div>
@@ -30,7 +34,7 @@ $('#id_search').submit(function(){
    $.ajax({
       type : 'GET',
       url : '/tan_tournaments',
-	  data: {uscf_id: uscf_id},
+	  data: {uscf_id: uscf_id, type: $("#type_regular").attr("checked") ? 'regular' : 'quick'},
       dataType : 'json',
 	  error: function(){
 		alert("There's an error!  e-mail acl68@case.edu");
@@ -43,7 +47,9 @@ $('#id_search').submit(function(){
 		}
 		numTournaments = data["num"];
 		if (numTournaments == 0){
-			$("#test").html("That player has never played in a tournament");
+			$("#test").html("That player has never played in a " + 
+				($("#type_regular").attr("checked") ? "regular " : "quick ") + 
+				"tournament");
 			$("#id_search").show();
 			return;
 		}

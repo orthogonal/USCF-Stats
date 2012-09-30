@@ -95,7 +95,7 @@ class UscfWebsite
          link = names[j].at_css("a")
          regChanges = regulars[j].text.scan(/\d+{3,4}/) # The 3,4 is to avoid the (P20) case, there will never be a 3-digit provisional.
          quickChanges = quicks[j].text.scan(/\d+{3,4}/)
-         if ((type == self::REGULAR && quickChanges.length != 0) || (type == self::QUICK && regularChanges.length != 0)) then next end
+         if ((type == self::REGULAR && regChanges.length == 0) || (type == self::QUICK && quickChanges.length == 0)) then next end
          section = names[j].at_css("small").text.scan(/\d+/).first.to_i
          name = link.text
          link = link.attributes()["href"].to_s

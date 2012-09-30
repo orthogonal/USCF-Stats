@@ -16,12 +16,13 @@ class InterfaceController < ApplicationController
   
   def tan_tournaments
     id = params[:uscf_id].strip
+    type = (params[:type] == "regular") ? UscfWebsite::REGULAR : UscfWebsite::QUICK
+    puts "TYPE: #{type}"
     if !(id.match(/\d{8}/))
       render :js => ""
       return
     end
-    history = UscfWebsite.get_rating_history_from_id(id.to_i, UscfWebsite::ALL)
-    puts "HISTORY: #{history}"
+    history = UscfWebsite.get_rating_history_from_id(id.to_i, type)
     obj = {:num => history.length}
     for i in 0...history.length
       tournament_id = history[i][:id]
