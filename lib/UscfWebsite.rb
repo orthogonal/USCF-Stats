@@ -113,6 +113,21 @@ class UscfWebsite
     return result
   end
   
+  def self.get_peak_rating_from_id(id, type)
+    history = get_rating_history_from_id(id, type)
+    history.map!{|x| x[:regular][:post] ||= 0; x[:quick][:post] ||= 0; x}
+    result = {:regular => nil, :quick => nil}
+    if (type != self::QUICK && history.length > 0)
+       history.sort_by!{|item| -item[:regular][:post]}
+       result[:regular] = history.first[:regular][:post]
+    end
+    if (type != self::REGULAR && history.length > 0)
+       history.sort_by!{|item| -item[:quick][:post]}
+       result[:quick] = history.first[:quick][:post]
+    end
+    return result
+  end
+  
   def self.get_tournaments(id, tournaments, sections)
     doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}"))
     
