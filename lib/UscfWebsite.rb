@@ -65,6 +65,14 @@ class UscfWebsite
   end
   
   def self.get_tournaments_from_id(id, type)
+    return self.tournament_history(id, type, false)
+  end
+  
+  def self.get_rating_history_from_id(id, type)
+    return self.tournament_history(id, type, true)
+  end
+  
+  def self.tournament_history(id, type, changes)
     doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}"))
     
     # Figure out how many pages of tournament records the player has
@@ -85,7 +93,6 @@ class UscfWebsite
        quicks.shift
        for j in 0...(names.length - 1)
          link = names[j].at_css("a")
-         puts "FOR J = #{j}, NAMES IS #{names[j]}, REGULARS IS #{regulars[j]}, QUICKS IS #{quicks[j]}"
          regChanges = regulars[j].text.scan(/\d+/)
          quickChanges = quicks[j].text.scan(/\d+/)
          if ((type == self::REGULAR && quickChanges.length != 0) || (type == self::QUICK && regularChanges.length != 0)) then next end
@@ -94,7 +101,13 @@ class UscfWebsite
          link = link.attributes()["href"].to_s
          id = link[link.index('?') + 1, (link.index('-') - link.index('?') - 1)]
          date = link[link.index('?') + 1, 8]
-         result << {:name => name, :id => id, :date => date}
+         if (changes)
+           regChanges = (regChanges.length == 0) ? {:pre => nil, :post => nil} : {:pre => regChanges[0].to_i, :post => regChanges[1].to_i}
+           quickChanges = (quickChanges.length == 0) ? {:pre => nil, :post => nil} : {:pre => quickChanges[0].to_i, :post => quickChanges[1].to_i}
+           result << {:name => name, :id => id, :date => date, :regular => regChanges, :quick => quickChanges}
+         else
+           result << {:name => name, :id => id, :date => date}
+         end
        end 
     end
     return result
