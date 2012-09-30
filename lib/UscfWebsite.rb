@@ -93,20 +93,20 @@ class UscfWebsite
        quicks.shift
        for j in 0...(names.length - 1)
          link = names[j].at_css("a")
-         regChanges = regulars[j].text.scan(/\d+/)
-         quickChanges = quicks[j].text.scan(/\d+/)
+         regChanges = regulars[j].text.scan(/\d+{3,4}/) # The 3,4 is to avoid the (P20) case, there will never be a 3-digit provisional.
+         quickChanges = quicks[j].text.scan(/\d+{3,4}/)
          if ((type == self::REGULAR && quickChanges.length != 0) || (type == self::QUICK && regularChanges.length != 0)) then next end
          section = names[j].at_css("small").text.scan(/\d+/).first.to_i
          name = link.text
          link = link.attributes()["href"].to_s
-         id = link[link.index('?') + 1, (link.index('-') - link.index('?') - 1)]
-         date = link[link.index('?') + 1, 8]
+         tournament_id = link[link.index('?') + 1, (link.index('-') - link.index('?') - 1)]
+         date = link[link.index('?') + 1, 8].to_i
          if (changes)
            regChanges = (regChanges.length == 0) ? {:pre => nil, :post => nil} : {:pre => regChanges[0].to_i, :post => regChanges[1].to_i}
            quickChanges = (quickChanges.length == 0) ? {:pre => nil, :post => nil} : {:pre => quickChanges[0].to_i, :post => quickChanges[1].to_i}
-           result << {:name => name, :id => id, :date => date, :regular => regChanges, :quick => quickChanges}
+           result << {:name => name, :id => tournament_id, :date => date, :regular => regChanges, :quick => quickChanges}
          else
-           result << {:name => name, :id => id, :date => date}
+           result << {:name => name, :id => tournament_id, :date => date}
          end
        end 
     end
@@ -126,6 +126,37 @@ class UscfWebsite
        result[:quick] = history.first[:quick][:post]
     end
     return result
+  end
+  
+  def self.get_rating_on_date_from_id(id, date)
+    # Date should be ie YYYYMMDD, and an integer
+    history = get_rating_history_from_id(id, self::ALL)
+    results = {:regular => 0, :quick => 0}
+    history.sort_by!{|item| -item[:date]}
+    i = 0;
+    while (history[i] && history[i][:date] > date)
+      i += 1
+    end
+    if !(history[i]) then return results end   # If the date was off the end of the array, return both as unrated.
+    if (history[i][:regular][:post]) then results[:regular] = history[i][:regular][:post] end  # Set both ratings if they exist
+    if (history[i][:quick][:post]) then results[:quick] = history[i][:quick][:post] end
+    if (!(history[i][:regular][:post]) || !(history[i][:quick][:post])) # At least one will exist
+      if (!(history[i][:regular][:post]))
+        while (history[i] && !(history[i][:regular][:post]))
+          i += 1
+        end
+        if (history[i]) then return (results[:regular] = history[i][:regular][:post]; results) end
+        return results
+      else
+        while (history[i] && !(history[i][:quick][:post]))
+          i += 1
+        end
+        if (history[i]) then return (results[:quick] = history[i][:quick][:post]; results) end
+        return results
+      end
+    else
+      return results
+    end
   end
   
   def self.get_tournaments(id, tournaments, sections)
