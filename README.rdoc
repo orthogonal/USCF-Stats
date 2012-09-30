@@ -20,3 +20,20 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
   and arrays back and forth to collect all the data
  -Added some jQuery to make the user interface a little more friendly and show a progress
   indicator with % complete and the date of the last tournament processed
+9/24:
+ -Worked on the Stanford machine learning course
+9/25:
+ -Worked on the Stanford machine learning course
+9/26:
+ -Built a good user interface
+ -Wrote an intro to the app to show to people
+9/27:
+ -Spent a long time fighting with the poorly-formatted USCF website
+ -Learned that Ruby regular expressions don't recognize some of the UTF-8 blank space characters
+9/28:
+ -Talked to GoDaddy and learned how to properly redirect naked domains through the Heroku proxy to the main page.
+ -Put a link to the website on chess.stackexchange.com
+9/29:
+ -Added a bunch of methods to the API
+ -Did some bug fixing
+ -Played in a tournament and invited people to visit the website
