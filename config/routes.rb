@@ -1,9 +1,9 @@
 Uscfstats::Application.routes.draw do
   
   root :to => "interface#index"
-  match "/complete", :to => "interface#complete"
-  match "/tournaments", :to => "interface#tournaments"
-  match "/from_tournament", :to => "interface#from_tournament"
+  match "/tan_tournaments", :to => "interface#tan_tournaments"
+  match "/tan_opponents", :to => "interface#tan_opponents"
+  match "/tan_complete", :to => "interface#tan_complete"
   match "/complete", :to => "interface#complete"
 
   # The priority is based upon order of creation:

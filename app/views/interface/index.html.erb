@@ -25,11 +25,12 @@
 <script>
 $('#id_search').submit(function(){
    $("#id_search").hide();
-   $("#test").html("Crawling the USCF website for your tournament data and your opponent's profiles");
+   $("#test").html("Crawling the USCF website for your tournament data and your opponents' profiles");
+   var uscf_id = $("#uscf_id").val()
    $.ajax({
       type : 'GET',
-      url : '/tournaments',
-	  data: {uscf_id: $("#uscf_id").val()},
+      url : '/tan_tournaments',
+	  data: {uscf_id: uscf_id},
       dataType : 'json',
 	  error: function(){
 		alert("There's an error!  e-mail acl68@case.edu");
@@ -50,26 +51,28 @@ $('#id_search').submit(function(){
 		j = 0;
 		stuff = {};
 		for (i = 0; i < numTournaments; i++){
+			console.log(data[i])
 			$.ajax({
 				type : 'GET',
-				url: '/from_tournament',
-				data: {url: data[i]},
+				url: '/tan_opponents',
+				data: {uscf_id: uscf_id, tournament: data[i].tournament_id, section: data[i].section},
 				dataType: 'json',
 				error: function(){
 					alert("There's an error!  e-mail acl68@case.edu");
 				},
 				success: function(data2){
 					++j;
+					console.log(data2)
 					date = data2[0].date;
 					date = date.substring(4, 6) + "/" + date.substring(6, 8) + "/" + date.substring(0, 4);
-					data2.splice(0, 1);
 					opponents = opponents.concat(data2);
 					$("#test").html("Crawling the USCF website for your tournament data and your opponents' profiles<br />Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />"
 						+ "Tournament " + j + "/" + numTournaments + "<br />Last date processed: " + date);
 					if (j == numTournaments){
+						console.log(opponents)
 						$.ajax({
 						      type : 'POST',
-						      url : '/complete',
+						      url : '/tan_complete',
 							  data : {stuff: opponents},
 						      dataType : 'script'
 						});

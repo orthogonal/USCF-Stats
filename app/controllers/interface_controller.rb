@@ -5,65 +5,91 @@ class InterfaceController < ApplicationController
   require 'UscfWebsite'
   require 'json'
   
-  def setup
-    @tournaments = Array.new
-    @sections = Array.new
-    @opponents = Array.new
+  def setup_tan
+    @result = Array.new
   end
     
   def index
-    setup()  
+    setup_tan()
     render(:action => "index")
   end
   
-  def tournaments
-    setup()
+  def tan_tournaments
     id = params[:uscf_id].strip
-    puts "Request with ID: #{id}"
     if !(id.match(/\d{8}/))
       render :js => ""
       return
     end
-    UscfWebsite.get_tournaments(id, @tournaments, @sections)
-    obj = {:num => @tournaments.length}
-    for i in 0...(@tournaments.length)
-      url = "http://main.uschess.org/assets/msa_joomla/#{@tournaments[i].gsub("XtblMain", "XtblPlr")[0, @tournaments[i].rindex('-')]}%03d-#{id}" % @sections[i]
-      obj.merge! i => url
+    history = UscfWebsite.get_rating_history_from_id(id.to_i, UscfWebsite::ALL)
+    puts "HISTORY: #{history}"
+    obj = {:num => history.length}
+    for i in 0...history.length
+      tournament_id = history[i][:id]
+      section = history[i][:section]
+      date = history[i][:date]
+      name = history[i][:name]
+      regular = history[i][:regular][:pre]
+      quick = history[i][:quick][:pre]
+      obj.merge! i => {:date => date, :tournament_id => tournament_id, :section => section, :name => name, :regular => regular, :quick => quick}
     end
     respond_to do |format|
         format.json { render :js => obj.to_json}
     end
   end
   
-  def from_tournament
-    setup()
-    url = params[:url]
-    doc = Nokogiri::HTML(open(url))
-    links = doc.search("td:nth-child(5) a")
-    links.each do |link|
-      oppId = link.attr("href")[link.attr("href").index('?') + 1, link.attr("href").length]
-      ratings = UscfWebsite.get_actual_ratings_from_id(oppId)
-      @opponents << {:name => link.text, :id => oppId, :regular => ratings[:regular], :quick => ratings[:quick]}
+  def tan_opponents
+    id = params[:uscf_id].strip.to_i
+    tournament = params[:tournament].strip.to_i
+    section = params[:section].strip.to_i
+    opponents = UscfWebsite.get_opponents_from_tournament(id, tournament, section)
+    opponents.each do |opponent|
+      opponent.merge! :date => tournament.to_s[0,8]
     end
-    @opponents.uniq!  # Removes duplicates in-place
-    @opponents.sort_by!{|item| -item[:regular]}
-    @opponents.unshift({:date => url[url.index("?") + 1, url.index("?") + 9]})
     respond_to do |format|
-      format.json {render :js => @opponents.to_json}
+      format.json {render :js => opponents.to_json}
     end
   end
   
-  def complete
-    setup()
+  def tan_complete
+    setup_tan()
     stuff = params[:stuff].to_hash
-    @opponents = stuff.map{|key, value| value}
-    @opponents.uniq!
-    @opponents.sort_by!{|item| -item[:regular].to_i}
+    opponents = stuff.map{|key, value| value}
+    opponents.sort_by!{|item| -item[:id].to_i}
     
+    # Data format is an array of hashes with id, name, date, now{regular, quick}, then{regular{pre, post}, quick{pre, post}}
+    current_id = opponents.first[:id].to_i
+    this_opponent = Array.new
+    
+    result = Array.new
+    opponents.each do |opponent|
+      if (opponent[:id].to_i == current_id)
+        this_opponent << opponent
+      else  # If the id is different, it's a new opponent, so process the data for the current one. this_opponent is never empty.
+        this_opponent.sort_by!{|record| record[:date].to_i}
+        new_opponent = {:name => this_opponent.first[:name], 
+                        :id => current_id,
+                        :plays => this_opponent.length,
+                        :now => this_opponent.first[:now],
+                        :first => {:date => this_opponent.first[:date], 
+                                  :ratings => 
+          {:regular => (this_opponent.first[:then][:regular] != "") ? this_opponent.first[:then][:regular][:pre] : -1,
+           :quick => (this_opponent.first[:then][:quick] != "") ? this_opponent.first[:then][:quick][:pre] : -1}
+                                  },
+                        :last =>  {:date => this_opponent.last[:date], 
+                                    :ratings => 
+          {:regular => (this_opponent.last[:then][:regular] != "") ? this_opponent.last[:then][:regular][:pre] : -1,
+           :quick => (this_opponent.last[:then][:quick] != "") ? this_opponent.last[:then][:quick][:pre] : -1}
+                                    }
+                        }
+        @result << new_opponent
+        this_opponent = [opponent]
+        current_id = opponent[:id].to_i
+      end
+    end
+    @result.sort_by!{|record| -record[:now][:regular].to_i}
     respond_to do |format|
         format.js {}
     end
   end
-  
   
 end

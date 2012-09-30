@@ -91,7 +91,7 @@ class UscfWebsite
        regulars.shift # Everything shifts once to get rid of the column header
        quicks = doc.search("td:nth-child(4)")
        quicks.shift
-       for j in 0...(names.length - 1)
+       for j in 0...names.length
          link = names[j].at_css("a")
          regChanges = regulars[j].text.scan(/\d+{3,4}/) # The 3,4 is to avoid the (P20) case, there will never be a 3-digit provisional.
          quickChanges = quicks[j].text.scan(/\d+{3,4}/)
@@ -104,9 +104,9 @@ class UscfWebsite
          if (changes)
            regChanges = (regChanges.length == 0) ? {:pre => nil, :post => nil} : {:pre => regChanges[0].to_i, :post => regChanges[1].to_i}
            quickChanges = (quickChanges.length == 0) ? {:pre => nil, :post => nil} : {:pre => quickChanges[0].to_i, :post => quickChanges[1].to_i}
-           result << {:name => name, :id => tournament_id, :date => date, :regular => regChanges, :quick => quickChanges}
+           result << {:name => name, :id => tournament_id, :section => section, :date => date, :regular => regChanges, :quick => quickChanges}
          else
-           result << {:name => name, :id => tournament_id, :date => date}
+           result << {:name => name, :id => tournament_id, :section => section, :date => date}
          end
        end 
     end
@@ -130,6 +130,7 @@ class UscfWebsite
   
   def self.get_rating_on_date_from_id(id, date)
     # Date should be ie YYYYMMDD, and an integer
+    date = date.to_i
     history = get_rating_history_from_id(id, self::ALL)
     results = {:regular => 0, :quick => 0}
     history.sort_by!{|item| -item[:date]}
@@ -172,6 +173,52 @@ class UscfWebsite
     return dates
   end
   
+  def self.get_opponents_from_tournament(id, tournament_id, section)
+    url = "http://main.uschess.org/assets/msa_joomla/XtblPlr.php?#{tournament_id}-%03d-#{id}" % section
+    doc = Nokogiri::HTML(open(url))
+    links = doc.search("td:nth-child(5) a") # International events don't have the players listed as links, just 'ERROR'
+    
+    result = Array.new
+    
+    links.each do |link|
+      oppId = link.attr("href")[link.attr("href").index('?') + 1, 8].to_i
+      now_ratings = self.get_actual_ratings_from_id(oppId)
+      then_ratings = self.get_rating_changes_from_tournament(oppId, tournament_id, section) # That method needs to be re-done
+      result << {:id => oppId, :name => link.text, :now => now_ratings, :then => then_ratings}
+    end
+    
+    return result
+    
+  end
+  
+  def self.get_rating_changes_from_tournament(uscf_id, tournament_id, section)
+    url = "http://main.uschess.org/assets/msa_joomla/XtblPlr.php?#{tournament_id}-%03d-#{uscf_id}" % section
+    doc = Nokogiri::HTML(open(url))
+    i = 0
+    tds = doc.search("td")
+    td = tds[i]
+    while (td.text.downcase.index("rating") == nil || td.text.downcase.index("rating") > 5) do
+      i += 1
+      td = tds[i]
+    end
+    changes = td.next_element.next_element
+    rc = {:regular => nil, :quick => nil}
+    if (changes.text.index("R:") != nil)
+      regular_bit = changes.text.scan(/R:[^-]+->\d{3,4}/)
+      blocks = (regular_bit.length > 0) ? regular_bit.first.scan(/\d+{3,4}/) : [0, 0]
+      pre = blocks[0]
+      post = blocks[1]
+      rc[:regular] = {:pre => pre, :post => post}
+    end
+    if (changes.text.index("Q:") != nil)
+      quick_bit = changes.text.scan(/Q:[^-]+->\d{3,4}/)
+      blocks = (quick_bit.length > 0) ? quick_bit.first.scan(/\d+{3,4}/) : [0, 0]
+      pre = blocks[0]
+      post = blocks[1]
+      rc[:quick] = {:pre => pre, :post => post}
+    end
+    return rc
+  end
   
   # Down here are legacy methods to keep the current demo working, they're hacked together and probably will be removed later
   
@@ -212,35 +259,7 @@ class UscfWebsite
     form.submit
     return agent
   end
-    
-  def self.get_rating_changes_from_tournament(uscf_id, tournament_id, section)
-    url = "http://main.uschess.org/assets/msa_joomla/XtblPlr.php?#{tournament_id}-%03d-#{uscf_id}" % section
-    doc = Nokogiri::HTML(open(url))
-    i = 0
-    tds = doc.search("td")
-    td = tds[i]
-    while (td.text.downcase.index("rating") == nil || td.text.downcase.index("rating") > 5) do
-      i += 1
-      td = tds[i]
-    end
-    changes = td.next_element.next_element
-    rc = {:regular => nil, :quick => nil}
-    if (changes.text.index("R:") != nil)
-      regular_bit = changes.text.scan(/R:\s+\d+\D+\d+/)
-      blocks = (regular_bit.length > 0) ? regular_bit.first.scan(/\d+/) : [0, 0]
-      pre = blocks[0]
-      post = blocks[1]
-      rc[:regular] = {:pre => pre, :post => post}
-    end
-    if (changes.text.index("Q:") != nil)
-      quick_bit = changes.text.scan(/Q:\s+\d+\D+\d+/)
-      blocks = (quick_bit.length > 0) ? quick_bit.first.scan(/\d+/) : [0, 0]
-      pre = blocks[0]
-      post = blocks[1]
-      rc[:quick] = {:pre => pre, :post => post}
-    end
-    return rc
-  end
+
 
 
     

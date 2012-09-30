@@ -1,0 +1,26 @@
+<table><tr><td>Name</td><td>Regular</td><td>Quick</td><td>Plays</td><td>First regular</td><td>First quick</td><td>First date</td><td>Last regular</td><td>Last quick</td><td>Last date</td>
+<% if !(@result.nil?) %>
+	<% for i in 0...@result.length %>
+	<tr>
+		<td><a target="_blank" href="http://main.uschess.org/assets/msa_joomla/MbrDtlMain.php?<%= @result[i][:id] %>"><%= @result[i][:name] %>: </a></td>
+		
+		<td><%= (@result[i][:now][:regular].to_i != 0) ? @result[i][:now][:regular] : "Unr." %></td>
+		<td><%= (@result[i][:now][:quick].to_i != 0) ? @result[i][:now][:quick] : "Unr." %></td>
+		
+		<td><%= @result[i][:plays] %></td>
+		
+		<td><%= (@result[i][:first][:ratings][:regular].to_i == -1) ? "N/A" : 
+					(@result[i][:first][:ratings][:regular].to_i != 0) ? @result[i][:first][:ratings][:regular] : "Unr."%></td>
+		<td><%= (@result[i][:first][:ratings][:quick].to_i == -1) ? "N/A" : 
+					(@result[i][:first][:ratings][:quick].to_i != 0) ? @result[i][:first][:ratings][:quick] : "Unr."%></td>
+		<td><%= @result[i][:first][:date]%></td>
+		
+		<td><%= (@result[i][:last][:ratings][:regular].to_i == -1) ? "N/A" : 
+					(@result[i][:last][:ratings][:regular].to_i != 0) ? @result[i][:last][:ratings][:regular] : "Unr."%></td>
+		<td><%= (@result[i][:last][:ratings][:quick].to_i == -1) ? "N/A" : 
+					(@result[i][:last][:ratings][:quick].to_i != 0) ? @result[i][:last][:ratings][:quick] : "Unr."%></td>
+		<td><%= @result[i][:last][:date]%></td>
+	</tr>
+<% end %>
+</table>
+<% end %>
