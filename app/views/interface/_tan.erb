@@ -1,5 +1,6 @@
 <% if !(@result.nil?) %>
-	<% regular = (@result.first[:first][:ratings][:regular] ? true : false) %>
+	<% regular = ((@result.first[:first][:ratings][:regular] != -1) ? true : false) %>
+	<% puts "RESULTS: #{@result}"%>
 	<table>
 		<tr>
 			<td>Name</td>
@@ -28,11 +29,11 @@
 			%></td>
 		
 		<td><%= regular ? 
-				((@result[i][:first][:ratings][:regular].to_i == -1) ? "N/A" : 
-					(@result[i][:first][:ratings][:regular].to_i != 0) ? @result[i][:first][:ratings][:regular] : "Unr.")
+				((@result[i][:last][:ratings][:regular].to_i == -1) ? "N/A" : 
+					(@result[i][:last][:ratings][:regular].to_i != 0) ? @result[i][:last][:ratings][:regular] : "Unr.")
 						:
-				((@result[i][:first][:ratings][:quick].to_i == -1) ? "N/A" : 
-					(@result[i][:first][:ratings][:quick].to_i != 0) ? @result[i][:first][:ratings][:quick] : "Unr.")
+				((@result[i][:last][:ratings][:quick].to_i == -1) ? "N/A" : 
+					(@result[i][:last][:ratings][:quick].to_i != 0) ? @result[i][:last][:ratings][:quick] : "Unr.")
 			%></td>
 		<td><%= "#{@result[i][:first][:date][4,2]}/#{@result[i][:first][:date][6,2]}/#{@result[i][:first][:date][0,4]}"%></td>
 		<td><%= "#{@result[i][:last][:date][4,2]}/#{@result[i][:last][:date][6,2]}/#{@result[i][:last][:date][0,4]}"%></td>

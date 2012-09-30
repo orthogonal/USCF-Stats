@@ -17,7 +17,6 @@ class InterfaceController < ApplicationController
   def tan_tournaments
     id = params[:uscf_id].strip
     type = (params[:type] == "regular") ? UscfWebsite::REGULAR : UscfWebsite::QUICK
-    puts "TYPE: #{type}"
     if !(id.match(/\d{8}/))
       render :js => ""
       return
