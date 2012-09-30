@@ -1,7 +1,15 @@
+#encoding: UTF-8
 class UscfWebsite
   require "open-uri"
   require "nokogiri"
   require "mechanize"
+  
+  def self.get_player_name_from_id(id)
+    doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlMain.php?#{id}"))
+    header = doc.at_css("font b")
+    name = header.text.scan(/[A-Z][A-Z\s]+/)
+    return name
+  end
   
   def self.get_tournaments(id, tournaments, sections)
     doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}"))
@@ -72,23 +80,21 @@ class UscfWebsite
       td = tds[i]
     end
     changes = td.next_element.next_element
-    puts changes.text
     rc = {:regular => nil, :quick => nil}
-    if (changes.text.index("R:") != -1)
-      regular_bit = changes.text.scan(/R:\s+\d+\D+\d+/).first
-      blocks = regular_bit.scan(/\d+/)
+    if (changes.text.index("R:") != nil)
+      regular_bit = changes.text.scan(/R:\s+\d+\D+\d+/)
+      blocks = (regular_bit.length > 0) ? regular_bit.first.scan(/\d+/) : [0, 0]
       pre = blocks[0]
       post = blocks[1]
       rc[:regular] = {:pre => pre, :post => post}
     end
-    if (changes.text.index("Q:") != -1)
-      regular_bit = changes.text.scan(/Q:\s+\d+\D+\d+/).first
-      blocks = regular_bit.scan(/\d+/)
+    if (changes.text.index("Q:") != nil)
+      quick_bit = changes.text.scan(/Q:\s+\d+\D+\d+/)
+      blocks = (quick_bit.length > 0) ? quick_bit.first.scan(/\d+/) : [0, 0]
       pre = blocks[0]
       post = blocks[1]
       rc[:quick] = {:pre => pre, :post => post}
     end
-    puts rc
     return rc
   end
       
@@ -122,5 +128,7 @@ class UscfWebsite
     end
     return ratings
   end
+  
+
     
 end
