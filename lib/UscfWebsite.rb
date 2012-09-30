@@ -4,11 +4,100 @@ class UscfWebsite
   require "nokogiri"
   require "mechanize"
   
+  REGULAR = 0
+  QUICK = 1
+  ALL = 2
+  
   def self.get_player_name_from_id(id)
     doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlMain.php?#{id}"))
     header = doc.at_css("font b")
     name = header.text.scan(/[A-Z][A-Z\s]+/)
     return name
+  end
+  
+  def self.get_published_ratings_from_id(id)
+    doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlMain.php?#{id}"))
+    ratings = {:regular => 0, :quick => 0}
+    rowTitles = doc.search("td td td:nth-child(1)")
+    rowTitles.each do |node|
+      if node.text.include?("Regular Rating")
+        ratings[:regular] = node.next_sibling.next_sibling.text.strip
+        if (ratings[:regular].include?("\n")) then ratings[:regular] = ratings[:regular][0, ratings[:regular].index("\n")] end # Date
+        if (ratings[:regular].include?(" ")) then ratings[:regular] = ratings[:regular][0, ratings[:regular].index(" ")] end # Prov.
+        if (ratings[:regular].include?("Unrated")) then ratings[:regular] = 0 end # Unr.
+      elsif node.text.include?("Quick Rating")
+        ratings[:quick] = node.next_sibling.next_sibling.text.strip
+        if (ratings[:quick].include?("\n")) then ratings[:quick] = ratings[:quick][0, ratings[:quick].index("\n")] end # Date
+        if (ratings[:quick].include?(" ")) then ratings[:quick] = ratings[:quick][0, ratings[:quick].index(" ")] end # Prov.
+        if (ratings[:quick].include?("Unrated")) then ratings[:quick] = 0 end # Unr.
+      end
+    end
+    return ratings
+  end
+  
+  def self.get_actual_ratings_from_id(id)
+    doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}"))
+    ratings = {:regular => 0, :quick => 0}
+    pages = doc.search("nobr a")
+    pages = (pages.length != 0 ? pages.length : 1)
+    
+    for i in 1...(pages + 1)
+      if (i != 1) then doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}.#{i}")) end
+      regBlocks = doc.search("td:nth-child(3)")
+      quickBlocks = doc.search("td:nth-child(4)")
+      
+      regBlocks.each do |block|
+        if (block.text.include?("=>") && ratings[:regular] == 0)
+          ratings[:regular] = block.text[block.text.index("=>") + 2, block.text.length].strip.to_i
+          break
+        end
+      end
+      
+      quickBlocks.each do |block|
+        if (block.text.include?("=>") && ratings[:quick] == 0)
+          ratings[:quick] = block.text[block.text.index("=>") + 2, block.text.length].strip.to_i
+          break
+        end
+      end
+      if (ratings[:quick] > 0 && ratings[:regular] > 0) then break end
+    end
+    return ratings
+  end
+  
+  def self.get_tournaments_from_id(id, type)
+    doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}"))
+    
+    # Figure out how many pages of tournament records the player has
+    pages = doc.search("nobr a")
+    pages = (pages.length != 0 ? pages.length : 1)
+    
+    result = Array.new
+    
+    # Go through each page, get all the blocks with tournament information, add requested data to return array
+    for i in 1...(pages + 1)
+       if (i != 1) then doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlTnmtHst.php?#{id}.#{i}")) end
+       names = doc.search("td:nth-child(2)")
+       names.shift    # This selector grabs an extra blank td from somewhere else on the page as its first item
+       names.shift    # You have to shift twice because it's a Nokogiri Nodeset, not an array, so you can't do shift(2)
+       regulars = doc.search("td:nth-child(3)")
+       regulars.shift # Everything shifts once to get rid of the column header
+       quicks = doc.search("td:nth-child(4)")
+       quicks.shift
+       for j in 0...(names.length - 1)
+         link = names[j].at_css("a")
+         puts "FOR J = #{j}, NAMES IS #{names[j]}, REGULARS IS #{regulars[j]}, QUICKS IS #{quicks[j]}"
+         regChanges = regulars[j].text.scan(/\d+/)
+         quickChanges = quicks[j].text.scan(/\d+/)
+         if ((type == self::REGULAR && quickChanges.length != 0) || (type == self::QUICK && regularChanges.length != 0)) then next end
+         section = names[j].at_css("small").text.scan(/\d+/).first.to_i
+         name = link.text
+         link = link.attributes()["href"].to_s
+         id = link[link.index('?') + 1, (link.index('-') - link.index('?') - 1)]
+         date = link[link.index('?') + 1, 8]
+         result << {:name => name, :id => id, :date => date}
+       end 
+    end
+    return result
   end
   
   def self.get_tournaments(id, tournaments, sections)
