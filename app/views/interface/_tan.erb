@@ -1,42 +1,42 @@
-<% if !(@result.nil?) %>
-	<% regular = ((@result.first[:first][:ratings][:regular] != -1) ? true : false) %>
-	<% puts "RESULTS: #{@result}"%>
+<% if !(opponents.nil?) %>
+	<% puts "RESULTS: #{opponents}"%>
+	<% regular = (@@type = UscfWebsite::REGULAR) ? true : false %>
 	<table>
 		<tr>
-			<td>Name</td>
-			<td>Regular</td>
-			<td>Quick</td>
-			<td>Plays</td>
-			<td>First rating</td>
-			<td>Last rating</td>
-			<td>First date</td>
-			<td>Last date</td>
-	<% for i in 0...@result.length %>
+			<td id="name" class="header">Name</td>
+			<td id="regular" class="header">Regular</td>
+			<td id="quick" class="header">Quick</td>
+			<td id="plays" class="header">Plays</td>
+			<td id="firstRating" class="header">First rating</td>
+			<td id="lastRating" class="header">Last rating</td>
+			<td id="firstDate" class="header">First date</td>
+			<td id="lastDate" class="header">Last date</td>
+	<% for i in 0...opponents.length %>
 	<tr>
-		<td><a target="_blank" href="http://main.uschess.org/assets/msa_joomla/MbrDtlMain.php?<%= @result[i][:id] %>"><%= @result[i][:name] %>: </a></td>
+		<td><a target="_blank" href="http://main.uschess.org/assets/msa_joomla/MbrDtlMain.php?<%= opponents[i][:id] %>"><%= opponents[i][:name] %>: </a></td>
 		
-		<td><%= (@result[i][:now][:regular].to_i != 0) ? @result[i][:now][:regular] : "Unr." %></td>
-		<td><%= (@result[i][:now][:quick].to_i != 0) ? @result[i][:now][:quick] : "Unr." %></td>
+		<td><%= (opponents[i][:now][:regular].to_i != 0) ? opponents[i][:now][:regular] : "Unr." %></td>
+		<td><%= (opponents[i][:now][:quick].to_i != 0) ? opponents[i][:now][:quick] : "Unr." %></td>
 		
-		<td><%= @result[i][:plays] %></td>
+		<td><%= opponents[i][:plays] %></td>
 		
 		<td><%= regular ? 
-				((@result[i][:first][:ratings][:regular].to_i == -1) ? "N/A" : 
-					(@result[i][:first][:ratings][:regular].to_i != 0) ? @result[i][:first][:ratings][:regular] : "Unr.")
+				((opponents[i][:first][:ratings][:regular].to_i == -1) ? "N/A" : 
+					(opponents[i][:first][:ratings][:regular].to_i != 0) ? opponents[i][:first][:ratings][:regular] : "Unr.")
 						:
-				((@result[i][:first][:ratings][:quick].to_i == -1) ? "N/A" : 
-					(@result[i][:first][:ratings][:quick].to_i != 0) ? @result[i][:first][:ratings][:quick] : "Unr.")
+				((opponents[i][:first][:ratings][:quick].to_i == -1) ? "N/A" : 
+					(opponents[i][:first][:ratings][:quick].to_i != 0) ? opponents[i][:first][:ratings][:quick] : "Unr.")
 			%></td>
 		
 		<td><%= regular ? 
-				((@result[i][:last][:ratings][:regular].to_i == -1) ? "N/A" : 
-					(@result[i][:last][:ratings][:regular].to_i != 0) ? @result[i][:last][:ratings][:regular] : "Unr.")
+				((opponents[i][:last][:ratings][:regular].to_i == -1) ? "N/A" : 
+					(opponents[i][:last][:ratings][:regular].to_i != 0) ? opponents[i][:last][:ratings][:regular] : "Unr.")
 						:
-				((@result[i][:last][:ratings][:quick].to_i == -1) ? "N/A" : 
-					(@result[i][:last][:ratings][:quick].to_i != 0) ? @result[i][:last][:ratings][:quick] : "Unr.")
+				((opponents[i][:last][:ratings][:quick].to_i == -1) ? "N/A" : 
+					(opponents[i][:last][:ratings][:quick].to_i != 0) ? opponents[i][:last][:ratings][:quick] : "Unr.")
 			%></td>
-		<td><%= "#{@result[i][:first][:date][4,2]}/#{@result[i][:first][:date][6,2]}/#{@result[i][:first][:date][0,4]}"%></td>
-		<td><%= "#{@result[i][:last][:date][4,2]}/#{@result[i][:last][:date][6,2]}/#{@result[i][:last][:date][0,4]}"%></td>
+		<td><%= "#{opponents[i][:first][:date][4,2]}/#{opponents[i][:first][:date][6,2]}/#{opponents[i][:first][:date][0,4]}"%></td>
+		<td><%= "#{opponents[i][:last][:date][4,2]}/#{opponents[i][:last][:date][6,2]}/#{opponents[i][:last][:date][0,4]}"%></td>
 	</tr>
 <% end %>
 </table>

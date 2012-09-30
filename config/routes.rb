@@ -4,7 +4,7 @@ Uscfstats::Application.routes.draw do
   match "/tan_tournaments", :to => "interface#tan_tournaments"
   match "/tan_opponents", :to => "interface#tan_opponents"
   match "/tan_complete", :to => "interface#tan_complete"
-  match "/complete", :to => "interface#complete"
+  match "/tan_resort", :to => "interface#tan_resort"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

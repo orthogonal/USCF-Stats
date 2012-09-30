@@ -5,6 +5,9 @@ class InterfaceController < ApplicationController
   require 'UscfWebsite'
   require 'json'
   
+  @@list = Array.new
+  @@type = UscfWebsite::REGULAR
+  
   def setup_tan
     @result = Array.new
   end
@@ -16,12 +19,12 @@ class InterfaceController < ApplicationController
   
   def tan_tournaments
     id = params[:uscf_id].strip
-    type = (params[:type] == "regular") ? UscfWebsite::REGULAR : UscfWebsite::QUICK
+    @@type = (params[:type] == "regular") ? UscfWebsite::REGULAR : UscfWebsite::QUICK
     if !(id.match(/\d{8}/))
       render :js => ""
       return
     end
-    history = UscfWebsite.get_rating_history_from_id(id.to_i, type)
+    history = UscfWebsite.get_rating_history_from_id(id.to_i, @@type)
     obj = {:num => history.length}
     for i in 0...history.length
       tournament_id = history[i][:id]
@@ -61,35 +64,66 @@ class InterfaceController < ApplicationController
     this_opponent = Array.new
     
     result = Array.new
-    opponents.each do |opponent|
-      if (opponent[:id].to_i == current_id)
+    opponents.each_with_index do |opponent, index|
+      if (opponent[:id].to_i == current_id && index != opponents.length - 1)
         this_opponent << opponent
       else  # If the id is different, it's a new opponent, so process the data for the current one. this_opponent is never empty.
-        this_opponent.sort_by!{|record| record[:date].to_i}
-        new_opponent = {:name => this_opponent.first[:name], 
-                        :id => current_id,
-                        :plays => this_opponent.length,
-                        :now => this_opponent.first[:now],
-                        :first => {:date => this_opponent.first[:date], 
-                                  :ratings => 
-          {:regular => (this_opponent.first[:then][:regular] != "") ? this_opponent.first[:then][:regular][:pre] : -1,
-           :quick => (this_opponent.first[:then][:quick] != "") ? this_opponent.first[:then][:quick][:pre] : -1}
-                                  },
-                        :last =>  {:date => this_opponent.last[:date], 
+        puts "#{index}/#{opponents.length}, Opponents list is #{this_opponent}"
+        (index != opponents.length - 1 ? 1 : 2).times do
+          this_opponent.sort_by!{|record| record[:date].to_i}
+          new_opponent = {:name => this_opponent.first[:name], 
+                          :id => current_id,
+                          :plays => this_opponent.length,
+                          :now => this_opponent.first[:now],
+                          :first => {:date => this_opponent.first[:date], 
                                     :ratings => 
-          {:regular => (this_opponent.last[:then][:regular] != "") ? this_opponent.last[:then][:regular][:pre] : -1,
-           :quick => (this_opponent.last[:then][:quick] != "") ? this_opponent.last[:then][:quick][:pre] : -1}
-                                    }
-                        }
-        @result << new_opponent
-        this_opponent = [opponent]
-        current_id = opponent[:id].to_i
+            {:regular => (this_opponent.first[:then][:regular] != "") ? this_opponent.first[:then][:regular][:pre] : -1,
+             :quick => (this_opponent.first[:then][:quick] != "") ? this_opponent.first[:then][:quick][:pre] : -1}
+                                    },
+                          :last =>  {:date => this_opponent.last[:date], 
+                                      :ratings => 
+            {:regular => (this_opponent.last[:then][:regular] != "") ? this_opponent.last[:then][:regular][:pre] : -1,
+             :quick => (this_opponent.last[:then][:quick] != "") ? this_opponent.last[:then][:quick][:pre] : -1}
+                                      }
+                          }
+          @result << new_opponent
+          this_opponent = [opponent]
+          current_id = opponent[:id].to_i
+        end
       end
     end
     @result.sort_by!{|record| -record[:now][:regular].to_i}
+    @@list = @result
     respond_to do |format|
         format.js {}
     end
   end
   
+  def tan_resort
+    setup_tan()
+    @result = @@list
+    case params[:column]
+      when "Name"
+        @result.sort!{|row1, row2| row1[:name] <=> row2[:name]}
+      when "Regular"
+        @result.sort_by!{|row| -row[:now][:regular].to_i}
+      when "Quick"
+        @result.sort_by!{|row| -row[:now][:quick].to_i}
+      when "Plays"
+        @result.sort_by!{|row| -row[:plays].to_i}
+      when "First rating"
+        @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:first][:ratings][:regular] : row[:first][:ratings][:quick]).to_i}
+      when "Last rating"
+        @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:last][:ratings][:regular] : row[:last][:ratings][:quick]).to_i}
+      when "First date"
+        @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:first][:date] : row[:first][:date]).to_i}
+      when "Last date"
+        @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:last][:date] : row[:last][:date]).to_i}
+    end
+    puts "LIST: #{@@list}"
+    puts "RESULT: #{@result}"
+    respond_to do |format|
+      format.js {}
+    end
+  end
 end

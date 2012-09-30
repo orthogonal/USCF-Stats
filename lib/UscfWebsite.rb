@@ -204,17 +204,17 @@ class UscfWebsite
     changes = td.next_element.next_element
     rc = {:regular => nil, :quick => nil}
     if (changes.text.index("R:") != nil)
-      regular_bit = changes.text.scan(/R:[^-]+->\d{3,4}/)
+      regular_bit = changes.text.scan(/R:[^-]+->\s*\d{3,4}/)
       blocks = (regular_bit.length > 0) ? regular_bit.first.scan(/\d+{3,4}/) : [0, 0]
-      pre = blocks[0]
-      post = blocks[1]
+      pre = (blocks.length > 1) ? blocks[0] : 0
+      post = (blocks.length > 1) ? blocks[1] : blocks[0]
       rc[:regular] = {:pre => pre, :post => post}
     end
     if (changes.text.index("Q:") != nil)
-      quick_bit = changes.text.scan(/Q:[^-]+->\d{3,4}/)
+      quick_bit = changes.text.scan(/Q:[^-]+->\s*\d{3,4}/)
       blocks = (quick_bit.length > 0) ? quick_bit.first.scan(/\d+{3,4}/) : [0, 0]
-      pre = blocks[0]
-      post = blocks[1]
+      pre = (blocks.length > 1) ? blocks[0] : 0
+      post = (blocks.length > 1) ? blocks[1] : blocks[0]
       rc[:quick] = {:pre => pre, :post => post}
     end
     return rc

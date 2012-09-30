@@ -57,7 +57,6 @@ $('#id_search').submit(function(){
 		j = 0;
 		stuff = {};
 		for (i = 0; i < numTournaments; i++){
-			console.log(data[i])
 			$.ajax({
 				type : 'GET',
 				url: '/tan_opponents',
@@ -68,7 +67,6 @@ $('#id_search').submit(function(){
 				},
 				success: function(data2){
 					++j;
-					console.log(data2)
 					date = data2[0].date;
 					date = date.substring(4, 6) + "/" + date.substring(6, 8) + "/" + date.substring(0, 4);
 					opponents = opponents.concat(data2);
