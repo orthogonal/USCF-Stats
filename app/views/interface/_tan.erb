@@ -1,6 +1,5 @@
 <% if !(opponents.nil?) %>
-	<% puts "RESULTS: #{opponents}"%>
-	<% regular = (@@type = UscfWebsite::REGULAR) ? true : false %>
+	<% regular = (InterfaceController.type == UscfWebsite::REGULAR) ? true : false %>]
 	<table>
 		<tr>
 			<td id="name" class="header">Name &#x25BD;</td>
@@ -20,7 +19,7 @@
 		
 		<td><%= opponents[i][:plays] %></td>
 		
-		<td><%= regular ? 
+		<td><%= (regular) ? 
 				((opponents[i][:first][:ratings][:regular].to_i == -1) ? "N/A" : 
 					(opponents[i][:first][:ratings][:regular].to_i != 0) ? opponents[i][:first][:ratings][:regular] : "Unr.")
 						:
@@ -28,7 +27,7 @@
 					(opponents[i][:first][:ratings][:quick].to_i != 0) ? opponents[i][:first][:ratings][:quick] : "Unr.")
 			%></td>
 		
-		<td><%= regular ? 
+		<td><%= (regular) ? 
 				((opponents[i][:last][:ratings][:regular].to_i == -1) ? "N/A" : 
 					(opponents[i][:last][:ratings][:regular].to_i != 0) ? opponents[i][:last][:ratings][:regular] : "Unr.")
 						:

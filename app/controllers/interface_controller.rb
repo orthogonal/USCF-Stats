@@ -8,6 +8,10 @@ class InterfaceController < ApplicationController
   @@list = Array.new
   @@type = UscfWebsite::REGULAR
   
+  def InterfaceController::type
+    @@type
+  end
+  
   def setup_tan
     @result = Array.new
   end
@@ -68,7 +72,6 @@ class InterfaceController < ApplicationController
       if (opponent[:id].to_i == current_id && index != opponents.length - 1)
         this_opponent << opponent
       else  # If the id is different, it's a new opponent, so process the data for the current one. this_opponent is never empty.
-        puts "#{index}/#{opponents.length}, Opponents list is #{this_opponent}"
         (index != opponents.length - 1 ? 1 : 2).times do
           this_opponent.sort_by!{|record| record[:date].to_i}
           new_opponent = {:name => this_opponent.first[:name], 
