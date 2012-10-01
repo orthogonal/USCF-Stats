@@ -102,26 +102,25 @@ class InterfaceController < ApplicationController
   def tan_resort
     setup_tan()
     @result = @@list
-    case params[:column]
-      when "Name"
+    case (params[:column])
+      when "name"
         @result.sort!{|row1, row2| row1[:name] <=> row2[:name]}
-      when "Regular"
+      when "regular"
         @result.sort_by!{|row| -row[:now][:regular].to_i}
-      when "Quick"
+      when "quick"
         @result.sort_by!{|row| -row[:now][:quick].to_i}
-      when "Plays"
+      when "plays"
         @result.sort_by!{|row| -row[:plays].to_i}
-      when "First rating"
+      when "firstRating"
         @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:first][:ratings][:regular] : row[:first][:ratings][:quick]).to_i}
-      when "Last rating"
+      when "lastRating"
         @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:last][:ratings][:regular] : row[:last][:ratings][:quick]).to_i}
-      when "First date"
+      when "firstDate"
         @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:first][:date] : row[:first][:date]).to_i}
-      when "Last date"
+      when "lastDate"
         @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:last][:date] : row[:last][:date]).to_i}
     end
-    puts "LIST: #{@@list}"
-    puts "RESULT: #{@result}"
+    @column = params[:column]
     respond_to do |format|
       format.js {}
     end

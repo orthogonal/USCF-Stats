@@ -1,10 +1,14 @@
+<%# encoding: utf-8 %>
 $('#test').html("<%= escape_javascript(render('tan', opponents: @result)) %>");
+
+$("#<%= @column %>").html($("#<%= @column %>").html().substring(0, $("#<%= @column %>").html().length - 1) + "&#x25BC;")
+
 $(".header").each(function(){
 	$(this).click(function(){
 		$.ajax({
 			type : 'GET',
 			url : '/tan_resort',
-			data : {column: $(this).text(), reverse: "false"},
+			data : {column: $(this).attr("id"), reverse: "false"},
 			dataType : 'script'
 		});
 	});

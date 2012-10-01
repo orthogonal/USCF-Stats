@@ -1,11 +1,15 @@
+<%# encoding: utf-8 %>
 $('#test').html("<%= escape_javascript(render('tan', opponents: @result)) %>");
 $("#id_search").show();
+
+$("#regular").html("Regular &#x25BC;");
+
 $(".header").each(function(){
 	$(this).click(function(){
 		$.ajax({
 			type : 'GET',
 			url : '/tan_resort',
-			data : {column: $(this).text(), reverse: "false"},
+			data : {column: $(this).attr("id"), reverse: "false"},
 			dataType : 'script'
 		});
 	});
