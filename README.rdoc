@@ -43,3 +43,10 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Made the user interface a lot better
  -Let users choose between regular and quick history
  -Put sorting on the columns
+10/1:
+ -Identified problems in the current demo design
+ -Learned about Redis
+ -Implemented a Redis NoSQL cloud database and set up the application to work with it
+ -Rewrote various parts of the application to use the new database
+ -Fixed some bugs
+ -Set the type and USCF ID to be session variables
