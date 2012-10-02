@@ -5,8 +5,6 @@ class InterfaceController < ApplicationController
   require 'UscfWebsite'
   require 'json'
   
-  @@list = Array.new
-  
   def setup_tan
     @result = Array.new
   end
@@ -18,6 +16,7 @@ class InterfaceController < ApplicationController
   
   def tan_tournaments
     id = params[:uscf_id].strip
+    session[:uscf_id] = id
     session[:type] = (params[:type] == "regular") ? UscfWebsite::REGULAR : UscfWebsite::QUICK
     if !(id.match(/\d{8}/))
       render :js => ""
@@ -91,7 +90,8 @@ class InterfaceController < ApplicationController
       end
     end
     @result.sort_by!{|record| -record[:now][:regular].to_i}
-    @@list = @result
+    key = "d#{session[:uscf_id]}t#{session[:type]}"
+    REDIS.SET key, @result.to_json
     respond_to do |format|
         format.js {}
     end
@@ -99,8 +99,8 @@ class InterfaceController < ApplicationController
   
   def tan_resort
     setup_tan()
-    
-    @result = @@list
+    @result = JSON.parse(REDIS.GET "d#{session[:uscf_id]}t#{session[:type]}")
+    puts @result
     case (params[:column])
       when "name"
         @result.sort!{|row1, row2| row1[:name] <=> row2[:name]}
