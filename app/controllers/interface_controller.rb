@@ -93,7 +93,7 @@ class InterfaceController < ApplicationController
     puts "SESSION: #{session}"
     puts "RESULT: #{@result}"
     key = "d#{session[:uscf_id]}t#{session[:type]}"
-    REDIS.SET key, @result.to_json
+    REDIS.SETEX key, 3600, @result.to_json
     puts "REDIS GET: #{REDIS.GET key}"
     respond_to do |format|
         format.js {}
@@ -104,6 +104,7 @@ class InterfaceController < ApplicationController
     setup_tan()
     key = "d#{session[:uscf_id]}t#{session[:type]}"
     @result = JSON.parse(REDIS.GET key).to_a
+    REDIS.EXPIRE key, 3600
     case (params[:column])
       when "name"
         @result.sort!{|row1, row2| row1["name"] <=> row2["name"]}
