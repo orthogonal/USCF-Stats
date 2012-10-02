@@ -22,6 +22,7 @@ end
 gem 'jquery-rails'
 gem 'nokogiri'
 gem 'mechanize'
+gem 'redis'
 
 group :production do
   gem 'therubyracer-heroku', '0.8.1.pre3'

@@ -73,7 +73,6 @@ $('#id_search').submit(function(){
 					$("#test").html("Crawling the USCF website for your tournament data and your opponents' profiles<br />Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />"
 						+ "Tournament " + j + "/" + numTournaments + "<br />Last date processed: " + date);
 					if (j == numTournaments){
-						console.log(opponents)
 						$.ajax({
 						      type : 'POST',
 						      url : '/tan_complete',
