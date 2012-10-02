@@ -102,9 +102,10 @@ class InterfaceController < ApplicationController
   def tan_resort
     setup_tan()
     puts "SESSION 2: #{session}"
-    @result = JSON.parse(REDIS.GET "d#{session[:uscf_id]}t#{session[:type]}")
-    puts "REDIS GET 2:  #{REDIS.GET key}"
+    key = "d#{session[:uscf_id]}t#{session[:type]}"
+    @result = JSON.parse(REDIS.GET key)
     puts "REDIS GET RESULT: #{@result}"
+    puts "REDIS GET 2:  #{REDIS.GET key}"
     case (params[:column])
       when "name"
         @result.sort!{|row1, row2| row1[:name] <=> row2[:name]}
