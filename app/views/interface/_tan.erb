@@ -11,6 +11,18 @@
 			<td id="firstDate" class="header">First date &#x25BD;</td>
 			<td id="lastDate" class="header">Last date &#x25BD;</td>
 	<% for i in 0...opponents.length %>
+	<% opponents[i].symbolize_keys! 	# This and below are because the result after grabbing from Redis has strings, not symbols, as keys. %>
+	<% opponents[i].each {
+			|key, value|
+			if (opponents[i][key].class.to_s.downcase == 'hash')
+				opponents[i][key].symbolize_keys!
+				opponents[i][key].each{
+					|subkey, subvalue| 
+					if (opponents[i][key][subkey].class.to_s.downcase == 'hash') then opponents[i][key][subkey].symbolize_keys! end
+				}
+			end
+		}
+	 %>
 	<tr>
 		<td><a target="_blank" href="http://main.uschess.org/assets/msa_joomla/MbrDtlMain.php?<%= opponents[i][:id] %>"><%= opponents[i][:name] %>: </a></td>
 		
