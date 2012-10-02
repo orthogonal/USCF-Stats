@@ -6,11 +6,6 @@ class InterfaceController < ApplicationController
   require 'json'
   
   @@list = Array.new
-  @@type = UscfWebsite::REGULAR
-  
-  def InterfaceController::type
-    @@type
-  end
   
   def setup_tan
     @result = Array.new
@@ -23,12 +18,12 @@ class InterfaceController < ApplicationController
   
   def tan_tournaments
     id = params[:uscf_id].strip
-    @@type = (params[:type] == "regular") ? UscfWebsite::REGULAR : UscfWebsite::QUICK
+    session[:type] = (params[:type] == "regular") ? UscfWebsite::REGULAR : UscfWebsite::QUICK
     if !(id.match(/\d{8}/))
       render :js => ""
       return
     end
-    history = UscfWebsite.get_rating_history_from_id(id.to_i, @@type)
+    history = UscfWebsite.get_rating_history_from_id(id.to_i, session[:type])
     obj = {:num => history.length}
     for i in 0...history.length
       tournament_id = history[i][:id]
@@ -104,6 +99,7 @@ class InterfaceController < ApplicationController
   
   def tan_resort
     setup_tan()
+    
     @result = @@list
     case (params[:column])
       when "name"
@@ -115,13 +111,13 @@ class InterfaceController < ApplicationController
       when "plays"
         @result.sort_by!{|row| -row[:plays].to_i}
       when "firstRating"
-        @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:first][:ratings][:regular] : row[:first][:ratings][:quick]).to_i}
+        @result.sort_by!{|row| -((session[:type] == UscfWebsite::REGULAR) ? row[:first][:ratings][:regular] : row[:first][:ratings][:quick]).to_i}
       when "lastRating"
-        @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:last][:ratings][:regular] : row[:last][:ratings][:quick]).to_i}
+        @result.sort_by!{|row| -((session[:type] == UscfWebsite::REGULAR) ? row[:last][:ratings][:regular] : row[:last][:ratings][:quick]).to_i}
       when "firstDate"
-        @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:first][:date] : row[:first][:date]).to_i}
+        @result.sort_by!{|row| -((session[:type] == UscfWebsite::REGULAR) ? row[:first][:date] : row[:first][:date]).to_i}
       when "lastDate"
-        @result.sort_by!{|row| -((@@type == UscfWebsite::REGULAR) ? row[:last][:date] : row[:last][:date]).to_i}
+        @result.sort_by!{|row| -((session[:type] == UscfWebsite::REGULAR) ? row[:last][:date] : row[:last][:date]).to_i}
     end
     @column = params[:column]
     respond_to do |format|

@@ -18,8 +18,8 @@
 		USCF ID: <%= text_field_tag "uscf_id" %>
 		<%= submit_tag "Go" %>
 		<div id="options">
-		    <%= radio_button_tag 'type', 'regular', true %> Regular
-		    <%= radio_button_tag 'type', 'quick' %> Quick
+		    <label><%= radio_button_tag 'type', 'regular', true %> Regular</label>
+		    <label><%= radio_button_tag 'type', 'quick' %> Quick</label>
 		</div>
 	<% end %>
 	<br />
