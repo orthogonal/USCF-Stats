@@ -90,11 +90,8 @@ class InterfaceController < ApplicationController
       end
     end
     @result.sort_by!{|record| -record[:now][:regular].to_i}
-    puts "SESSION: #{session}"
-    puts "RESULT: #{@result}"
     key = "d#{session[:uscf_id]}t#{session[:type]}"
     REDIS.SETEX key, 3600, @result.to_json
-    puts "REDIS GET: #{REDIS.GET key}"
     respond_to do |format|
         format.js {}
     end
