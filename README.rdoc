@@ -50,3 +50,7 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Rewrote various parts of the application to use the new database
  -Fixed some bugs
  -Set the type and USCF ID to be session variables
+10/2:
+ -Fixed some small bugs
+10/3:
+ -Worked on the Stanford machine learning course
