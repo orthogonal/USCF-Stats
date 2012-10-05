@@ -191,6 +191,46 @@ class UscfWebsite
     
   end
   
+  def self.get_results_against_opponents_from_tournament(id, tournament_id, section)
+    url = "http://main.uschess.org/assets/msa_joomla/XtblPlr.php?#{tournament_id}-%03d-#{id}" % section
+    doc = Nokogiri::HTML(open(url))
+    links = doc.search("td:nth-child(5) a") # International events don't have the players listed as links, just 'ERROR'
+    
+    result = Array.new
+    
+    links.each do |link|
+      obj = {:wdl => nil, :regular => -1, :quick => -1}
+      tds = link.parent.parent.children.to_a
+      tds.delete_if{|td| td.text.scan(/[A-Za-z0-9]/).length == 0}
+      
+      obj[:wdl] = tds[0].text.scan(/[WDL]{1}/).first
+      
+      if ((tds[2].text.index("R:")) != nil)
+        if ((tds[2].text.scan(/R: Unrated/)).length > 0)  # Player's initial rating was unrated, use the post rating
+          obj[:regular] = tds[3].text.scan(/\d+{3,4}/).first # Regardless of quick or regular, regular is first.
+        else
+          obj[:regular] = tds[2].text.scan(/R: \d+{3,4}/).first.scan(/\d+{3,4}/).first
+        end
+      end
+      
+      if ((tds[2].text.index("Q:")) != nil)
+        if ((tds[2].text.scan(/Q: Unrated/)).length > 0) 
+          if ((tds[2].text.index("R:")) == nil)   # If it was dual-rated, the index of R will not be nil, and we use the second number.
+            obj[:quick] = tds[3].text.scan(/\d+{3,4}/).first
+          else
+            obj[:quick] = tds[3].text.scan(/\d+{3,4}/).last
+          end
+        else
+          obj[:quick] = tds[2].text.scan(/Q: \d+{3,4}/).first.scan(/\d+{3,4}/).first
+        end
+      end
+      
+      result << obj 
+    end
+    
+    return result
+  end
+  
   def self.get_rating_changes_from_tournament(uscf_id, tournament_id, section)
     url = "http://main.uschess.org/assets/msa_joomla/XtblPlr.php?#{tournament_id}-%03d-#{uscf_id}" % section
     doc = Nokogiri::HTML(open(url))

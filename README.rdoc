@@ -54,3 +54,6 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Fixed some small bugs
 10/3:
  -Worked on the Stanford machine learning course
+10/4:
+ -Went to hack night with the Research Triangle Ruby meetup group
+ -Built the get_results_against_opponents_from_tournament method in the USCF Website API
