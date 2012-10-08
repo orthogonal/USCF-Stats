@@ -1,10 +1,14 @@
 Uscfstats::Application.routes.draw do
   
+  get "deltas/index"
+
   root :to => "interface#index"
   match "/tan_tournaments", :to => "interface#tan_tournaments"
   match "/tan_opponents", :to => "interface#tan_opponents"
   match "/tan_complete", :to => "interface#tan_complete"
   match "/tan_resort", :to => "interface#tan_resort"
+  match "/deltas", :to => "deltas#index"
+  match "/build_delta", :to => "deltas#buildchart"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -1,0 +1,17 @@
+<% puts "Test" %>
+jsdata = [];
+<% @data.each do |d| %>
+jsdata.push(["<%=d[:wdl]%>", <%=d[:rating]%>, <%=d[:delta]%>]);
+<% puts d %>
+<% end %>
+console.log(jsdata);
+var svg = d3.select("#scatterplot").append("svg");
+svg.selectAll("circle")
+	.data(jsdata)
+	.enter()
+	.append("circle")
+	.attr("cx", function(d){return (d[1] - 800)/2;})
+	.attr("cy", function(d){return (800 - d[2])/2;})
+	.attr("r", 5).style("fill", function(d){return d[0] == 'L' ? "red" : ((d[0] == 'W') ? "green" : "blue");})
+	.style("fill-opacity", 0.5)
+	.on("click", function(d){alert(d[1] + ", " + d[2])});

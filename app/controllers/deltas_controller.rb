@@ -1,0 +1,22 @@
+class DeltasController < ApplicationController
+  require 'UscfWebsite'
+  def index
+    render(:action => "index")
+  end
+  
+  def buildchart
+    history = UscfWebsite.get_rating_history_from_id(12842311, 0)
+    @data = Array.new
+    puts "HISTORY: #{history}"
+    history.each do |event|
+      result = UscfWebsite.get_results_against_opponents_from_tournament(12842311, event[:id], event[:section])
+      result.each do |row|
+        rating = (event[:regular][:pre] != 0) ? event[:regular][:pre] : event[:regular][:post]
+        @data << {:wdl => row[:wdl], :rating => rating, :delta => (row[:regular].to_i - rating)}
+      end
+    end
+    respond_to do |format|
+      format.js {}
+    end
+  end
+end

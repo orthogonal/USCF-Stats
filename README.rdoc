@@ -57,3 +57,12 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
 10/4:
  -Went to hack night with the Research Triangle Ruby meetup group
  -Built the get_results_against_opponents_from_tournament method in the USCF Website API
+10/5:
+ -Vacation to visit my father, didn't work on stuff
+10/6:
+ -Still on vacation
+ -Poked at the FANN neural network library
+10/7:
+ -Still on vacation
+ -Learned some D3JS
+ -Built draft of delta chart

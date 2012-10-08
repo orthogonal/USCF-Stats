@@ -101,6 +101,8 @@ class UscfWebsite
          link = link.attributes()["href"].to_s
          tournament_id = link[link.index('?') + 1, (link.index('-') - link.index('?') - 1)]
          date = link[link.index('?') + 1, 8].to_i
+         if (regulars[j].text.index("(Unrated)") != nil) then regChanges.unshift(0) end
+         if (quicks[j].text.index("(Unrated)") != nil) then quickChanges.unshift(0) end
          if (changes)
            regChanges = (regChanges.length == 0) ? {:pre => nil, :post => nil} : {:pre => regChanges[0].to_i, :post => regChanges[1].to_i}
            quickChanges = (quickChanges.length == 0) ? {:pre => nil, :post => nil} : {:pre => quickChanges[0].to_i, :post => quickChanges[1].to_i}
@@ -209,7 +211,7 @@ class UscfWebsite
         if ((tds[2].text.scan(/R: Unrated/)).length > 0)  # Player's initial rating was unrated, use the post rating
           obj[:regular] = tds[3].text.scan(/\d+{3,4}/).first # Regardless of quick or regular, regular is first.
         else
-          obj[:regular] = tds[2].text.scan(/R: \d+{3,4}/).first.scan(/\d+{3,4}/).first
+          obj[:regular] = tds[2].text.scan(/R:[ ]+\d+{3,4}/).first.scan(/\d+{3,4}/).first
         end
       end
       
@@ -221,7 +223,7 @@ class UscfWebsite
             obj[:quick] = tds[3].text.scan(/\d+{3,4}/).last
           end
         else
-          obj[:quick] = tds[2].text.scan(/Q: \d+{3,4}/).first.scan(/\d+{3,4}/).first
+          obj[:quick] = tds[2].text.scan(/Q:[ ]+\d+{3,4}/).first.scan(/\d+{3,4}/).first
         end
       end
       
