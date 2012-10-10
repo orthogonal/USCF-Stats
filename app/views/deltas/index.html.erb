@@ -1,10 +1,16 @@
-<button onclick="$.ajax({
-      type : 'POST',
-      url : '/build_delta',
-	  data : {},
-      dataType : 'script'
-});">Click me</button>
+<input type="text" id="uscfid" size="8" maxlength="8" style="font-size: 16px;"/>
+<button id="deltaSubmit">Generate</button>
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white;"></div>
-
-
 <script src="http://d3js.org/d3.v2.js"></script>
+<script type="text/javascript">
+	$("#deltaSubmit").click(function(){
+		$("#deltaSubmit").hide();
+		$("#uscfid").hide();
+		$.ajax({
+		      type : 'POST',
+		      url : '/build_delta',
+			  data : {uscf_id: $('#uscfid').val()},
+		      dataType : 'script'
+		});
+	})
+</script>

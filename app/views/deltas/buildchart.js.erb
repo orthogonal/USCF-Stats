@@ -2,6 +2,7 @@
 <% rmax = @data.max_by{|d| d[:rating]}[:rating] %>
 <% dmin = @data.min_by{|d| d[:delta]}[:delta] %>
 <% dmax = @data.max_by{|d| d[:delta]}[:delta] %>
+<% puts @data %>
 jsdata = [];
 <% @data.each do |d| %>
 jsdata.push(["<%=d[:wdl]%>", <%=d[:rating]%>, <%=d[:delta]%>]);
@@ -24,4 +25,5 @@ svg.selectAll("circle")
 	.on("click", function(d){alert(d[1] + ", " + d[2])});
 svg.selectAll(".x.axis").call(xAxis);
 svg.selectAll(".y.axis").call(yAxis);
+console.log("Supposedly we're good now");
 	
