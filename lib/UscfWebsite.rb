@@ -201,11 +201,13 @@ class UscfWebsite
     result = Array.new
     
     links.each do |link|
-      obj = {:wdl => nil, :regular => -1, :quick => -1}
+      obj = {:wdl => nil, :regular => -1, :quick => -1, :name => ""}
       tds = link.parent.parent.children.to_a
       tds.delete_if{|td| td.text.scan(/[A-Za-z0-9]/).length == 0}
       
       obj[:wdl] = tds[0].text.scan(/[WDL]{1}/).first
+      obj[:name] = tds[4].text.scan(/[A-Z ]+[A-Z]/).first
+      puts obj
       
       if ((tds[2].text.index("R:")) != nil)
         if ((tds[2].text.scan(/R: Unrated/)).length > 0)  # Player's initial rating was unrated, use the post rating
