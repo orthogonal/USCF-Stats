@@ -7,7 +7,7 @@ jsdata = [];
 <% puts d %>
 jsdata.push(["<%=d[:wdl]%>", <%=d[:rating]%>, <%=d[:delta]%>, "<%=d[:name]%>"]);
 <% end %>
-var svg = d3.select("#scatterplot").append("svg");
+var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 y = d3.scale.linear().domain([<%=dmax%>, <%=dmin%>]).range([0, 600]);
 x = d3.scale.linear().domain([<%=rmin%>, <%=rmax%>]).range([0, 800]);
 var xAxis = d3.svg.axis().orient("bottom").scale(x).ticks(15);
