@@ -66,3 +66,13 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Still on vacation
  -Learned some D3JS
  -Built draft of delta chart
+10/8:
+ -Worked on learning D3JS
+10/9:
+ -Added D3Js axis to delta chart
+ -Did some math to scale the locations and sizes of the axis and bubbles according to the specified width/height.
+ -Made the bubbles say who you played
+ -Updated the interface to make it a little better and let users input the ID of who to check out
+10/10:
+ -Usability testing, someone noticed a major bug in the deltas chart in later versions of Firefox.
+ -Opened issue, found solution and fixed it.
