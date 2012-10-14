@@ -8,7 +8,9 @@ Uscfstats::Application.routes.draw do
   match "/tan_complete", :to => "interface#tan_complete"
   match "/tan_resort", :to => "interface#tan_resort"
   match "/deltas", :to => "deltas#index"
-  match "/build_delta", :to => "deltas#buildchart"
+  match "/build_chart", :to => "deltas#build_chart"
+  match "/rating_history", :to => "deltas#rating_history"
+  match "/opp_results", :to => "deltas#opp_results"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

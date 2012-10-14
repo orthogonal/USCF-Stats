@@ -1,0 +1,30 @@
+<% rmin = @data.min_by{|d| d[:rating].to_i}[:rating].to_i %>
+<% rmax = @data.max_by{|d| d[:rating].to_i}[:rating].to_i %>
+<% dmin = @data.min_by{|d| d[:delta].to_i}[:delta].to_i %>
+<% dmax = @data.max_by{|d| d[:delta].to_i}[:delta].to_i %>
+jsdata = [];
+<% @data.each do |d| %>
+<% puts d %>
+jsdata.push(["<%=d[:wdl]%>", <%=d[:rating]%>, <%=d[:delta]%>, "<%=d[:name]%>"]);
+<% end %>
+var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
+y = d3.scale.linear().domain([<%=dmax%>, <%=dmin%>]).range([0, 600]);
+x = d3.scale.linear().domain([<%=rmin%>, <%=rmax%>]).range([0, 800]);
+var xAxis = d3.svg.axis().orient("bottom").scale(x).ticks(15);
+var yAxis = d3.svg.axis().orient("left").scale(y).ticks(15);
+svg.append("g").attr("class","x axis").call(xAxis).attr("transform","translate(60, " + ( ( (600 / (<%= dmax - dmin %>) ) * <%= dmax %> ) + 18) + ")");
+svg.append("g").attr("class","y axis").call(yAxis).attr("transform","translate(60, 20)");
+svg.selectAll("circle")
+	.data(jsdata)
+	.enter()
+	.append("circle")
+	.attr("cx", function(d){return ((800 / (<%= rmax - rmin %>)) * (d[1] - <%=rmin%>) + 60);})
+	.attr("cy", function(d){console.log("DMAX: <%= dmax %>, DMIN: <%= dmin %>, D2: " + d[2]); 
+							return 600 - ((600 / (<%= dmax - dmin %>)) * (d[2] - <%= dmin %>)) + 20;})
+	.attr("r", 5).style("fill", function(d){return d[0] == 'L' ? "red" : ((d[0] == 'W') ? "green" : "blue");})
+	.style("fill-opacity", 0.5)
+	.on("click", function(d){alert(d[3] + ": " + d[1] + ", " + d[2])});
+svg.selectAll(".x.axis").call(xAxis);
+svg.selectAll(".y.axis").call(yAxis);
+console.log("Supposedly we're good now");
+	

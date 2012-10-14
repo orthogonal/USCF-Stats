@@ -1,16 +1,71 @@
-<input type="text" id="uscfid" size="8" maxlength="8" style="font-size: 16px;"/>
-<button id="deltaSubmit">Generate</button>
+<%= form_tag({}, {:id => "delta"}) do %>
+	USCF ID: <%= text_field_tag "uscf_id" %>
+	<%= submit_tag "Go" %>
+	<div id="options">
+	    <label><%= radio_button_tag 'type', 'regular', true %> Regular</label>
+	    <label><%= radio_button_tag 'type', 'quick' %> Quick</label>
+	</div>
+<% end %>
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white;"></div>
 <script src="http://d3js.org/d3.v2.js"></script>
 <script type="text/javascript">
-	$("#deltaSubmit").click(function(){
-		$("#deltaSubmit").hide();
-		$("#uscfid").hide();
-		$.ajax({
-		      type : 'POST',
-		      url : '/build_delta',
-			  data : {uscf_id: $('#uscfid').val()},
-		      dataType : 'script'
-		});
+	$("#delta").submit(function(){
+	$("#delta").hide();
+	$("#uscf_id").hide();
+	var uscf_id = $("#uscf_id").val();
+	$.ajax({
+		type : 'GET',
+		url : '/rating_history',
+		data : {uscf_id: uscf_id, type: $("#type_regular").attr("checked") ? 'regular' : 'quick'},
+	    dataType : 'json',
+	  	error : function(){
+			alert("There's an error!  e-mail acl68@case.edu");
+		},
+		success : function(data){
+			if (!data){
+				return; //There's an error
+			}
+			numTournaments = data.length;
+			if (numTournaments == 0){
+				return;	//No tournament history
+			}
+			
+			results = [];
+			
+			j = 0;
+			for (i = 0; i < numTournaments; i++){
+				$.ajax({
+					type : 'GET',
+					url : '/opp_results',
+					data : {uscf_id: uscf_id, rating: data[i].rating, tournament: data[i].id, section: data[i].section},
+					dataType : 'json',
+					error : function(){
+						alert("There's an error!  e-mail acl68@case.edu");
+					},
+					success : function(data2){
+						results = results.concat(data2);
+						j++
+						if (j == numTournaments){
+							alert("Done");
+							console.log(results);
+							$.ajax({
+								type : 'POST',
+								url : '/build_chart',
+								data : {results: results},
+								dataType: 'script'
+							});
+						}
+					}
+				})
+			}
+		}
 	})
+	/*$.ajax({
+	      type : 'POST',
+	      url : '/build_delta',
+		  data : {uscf_id: $('#uscf_id').val(), type: $("#type_regular").attr("checked") ? 'regular' : 'quick'},
+	      dataType : 'script'
+	});*/
+	return false;
+});
 </script>

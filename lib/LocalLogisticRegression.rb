@@ -16,6 +16,7 @@ class LocalLogisticRegression
     #if (times == 0) then return b end
     w = Matrix.build(trainingData[:in].length, trainingData[:in].length){|row, col| (row == col) ? weight(xq, row) * pi_prime(row, b) : 0}
     x = Matrix.rows(trainingData[:in].each{|row| [1] + row})
+    e = Matrix.build(1, trainingData[:in].length){|row, col| weight(xq, row)}
     additive = (x.transpose * w * x).inverse * x.transpose * w
     b = (Matrix.rows(b) + additive)
     puts "B: #{b}"
