@@ -10,6 +10,7 @@ class DeltasController < ApplicationController
     session[:type] = type
     if !(id.match(/\d{8}/))
       render :js => ""
+      return
     end
     history = UscfWebsite.get_rating_history_from_id(id, type)
     result = Array.new;

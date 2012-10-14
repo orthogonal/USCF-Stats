@@ -207,7 +207,6 @@ class UscfWebsite
       
       obj[:wdl] = tds[0].text.scan(/[WDL]{1}/).first
       obj[:name] = tds[4].text.scan(/[A-Z ]+[A-Z]/).first
-      puts obj
       
       if ((tds[2].text.index("R:")) != nil)
         if ((tds[2].text.scan(/R: Unrated/)).length > 0)  # Player's initial rating was unrated, use the post rating

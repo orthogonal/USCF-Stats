@@ -1,5 +1,7 @@
 Uscfstats::Application.routes.draw do
   
+  get "performance/index"
+
   get "deltas/index"
 
   root :to => "interface#index"
@@ -11,6 +13,7 @@ Uscfstats::Application.routes.draw do
   match "/build_chart", :to => "deltas#build_chart"
   match "/rating_history", :to => "deltas#rating_history"
   match "/opp_results", :to => "deltas#opp_results"
+  match "/performance", :to => "performance#index"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
