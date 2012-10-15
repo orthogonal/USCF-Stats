@@ -3,7 +3,7 @@ class PerformanceController < ApplicationController
   require "UscfMath"
   
   def index
-    history = UscfWebsite.get_rating_history_from_id(12842311, UscfWebsite::REGULAR)
+    history = UscfWebsite.get_rating_history_from_id(13434851, UscfWebsite::REGULAR)
     tournaments = Array.new
     @performances = Array.new
     for i in 0...history.length do
@@ -11,7 +11,7 @@ class PerformanceController < ApplicationController
         :rating => (history[i][:regular][:pre] != 0) ? history[i][:regular][:pre] : history[i][:regular][:post]}
     end
     history.each do |event|
-      tourn_result = UscfWebsite.get_results_against_opponents_from_tournament(12842311, event[:id], event[:section])
+      tourn_result = UscfWebsite.get_results_against_opponents_from_tournament(13434851, event[:id], event[:section])
       results = Array.new
       tourn_result.each do |row|
         results << {:wdl => row[:wdl], :opp => row[:regular].to_i}

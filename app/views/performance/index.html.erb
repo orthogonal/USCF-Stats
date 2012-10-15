@@ -10,8 +10,10 @@
 
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white;"></div>
 <button onclick="grid()" id="grid">Grid</button>
+<button onclick="curvy()" id="curvy">Curvy</button>
 <script type="text/javascript">
 var gridOn = false;
+var curvyOn = false;
 var jsdata = [];
 <% @performances.each do |d| %>
 <% puts d %>
@@ -34,20 +36,6 @@ var ratexpos = ( ( (600 / (<%= rmax - rmin %>) ) * <%= rmax %> ) + 18);
 svg.append("g").attr("class","x axis").call(xAxis)
 	.attr("transform","translate(60, " + ((Math.max(ratexpos, perfxpos) > 614) ? 614 : Math.max(ratexpos, perfxpos)) + ")");
 svg.append("g").attr("class","y axis").call(yAxis).attr("transform","translate(60, 20)");
-
-svg.selectAll("circle")
-	.data(jsdata)
-	.enter()
-	.append("circle")
-	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
-								min = (+format.parse("<%=dmin%>"))/1000;
-								n   = +format.parse(d[0].toString())/1000;
-								return (800 / (max - min)) * (n - min) + 60
-					})
-	.attr("cy", function(d){return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[2] - <%= rmin %>)) + 20;})
-	.attr("r", 5).style("fill", "red")
-	.style("fill-opacity", 0.5)
-	.on("click", function(d){alert(d)});
 		
 svg.selectAll(".x.axis").call(xAxis);
 svg.selectAll(".y.axis").call(yAxis);
@@ -58,7 +46,7 @@ var perfline = d3.svg.line()
 						n   = +format.parse(d[0].toString())/1000;
 						return (800 / (max - min)) * (n - min) + 60
 					})
-    .y(function(d) { return (<%= pmax == pmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= pmin %>)) + 20;})
+    .y(function(d) { return (<%= pmax == pmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 18;})
     .interpolate("linear");
 var rateline = d3.svg.line()
     .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
@@ -66,11 +54,40 @@ var rateline = d3.svg.line()
 						n   = +format.parse(d[0].toString())/1000;
 						return (800 / (max - min)) * (n - min) + 60
 					})
-	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[2] - <%= rmin %>)) + 20;})
+	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[2] - <%= ymin %>)) + 18;})
 	.interpolate("linear");
-svg.append("svg:path").attr("d", perfline(jsdata)).style("stroke", "blue").style("stroke-width", 2).style("fill", "none");
-svg.append("svg:path").attr("d", rateline(jsdata)).style("stroke", "red").style("stroke-width", 2).style("fill", "none");
-console.log("Supposedly we're good now");
+var perfpath = svg.append("svg:path").attr("d", perfline(jsdata)).style("stroke", "blue").style("stroke-width", 2).style("fill", "none");
+var ratepath = svg.append("svg:path").attr("d", rateline(jsdata)).style("stroke", "red").style("stroke-width", 2).style("fill", "none");
+
+svg.selectAll("circle")
+	.data(jsdata)
+	.enter()
+	.append("circle")
+	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
+								min = (+format.parse("<%=dmin%>"))/1000;
+								n   = +format.parse(d[0].toString())/1000;
+								return (800 / (max - min)) * (n - min) + 60
+					})
+	.attr("cy", function(d){
+		return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[2] - <%= ymin %>)) + 20;})
+	.attr("r", 5).style("fill", "red")
+	.style("fill-opacity", 0.5)
+	.on("click", function(d){alert(d[2])})
+svg.selectAll("circleTwo")
+	.data(jsdata)
+	.enter()
+	.append("circle")
+	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
+								min = (+format.parse("<%=dmin%>"))/1000;
+								n   = +format.parse(d[0].toString())/1000;
+								return (800 / (max - min)) * (n - min) + 60
+					})
+	.attr("cy", function(d){console.log(d[1]); console.log(600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 20);
+		return (<%= pmax == pmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 20;})
+	.attr("r", 5).style("fill", "blue")
+	.style("fill-opacity", 0.5)
+	.on("click", function(d){alert(d[1])})
+	;
 
 function grid(){
 	if (gridOn == false){
@@ -87,6 +104,24 @@ function grid(){
 		svg.selectAll(".x.axis").call(xAxis);
 		svg.selectAll(".y.axis").call(yAxis);
 		gridOn = false;
+	}
+}
+
+function curvy(){
+	if (curvyOn == false){
+		$("#curvy").text("Linear");
+		rateline.interpolate('cardinal');
+		perfline.interpolate('cardinal');
+		perfpath.attr("d", perfline(jsdata));
+		ratepath.attr("d", rateline(jsdata));
+		curvyOn = true;
+	} else{
+		$("#curvy").text("Curvy");
+		rateline.interpolate('linear');
+		perfline.interpolate('linear');
+		perfpath.attr("d", perfline(jsdata));
+		ratepath.attr("d", rateline(jsdata));
+		curvyOn = false;
 	}
 }
 </script>
