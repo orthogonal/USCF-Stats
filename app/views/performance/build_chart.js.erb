@@ -1,0 +1,83 @@
+<% rmin = @performances.min_by{|d| d[:rating].to_i}[:rating].to_i %>
+<% rmax = @performances.max_by{|d| d[:rating].to_i}[:rating].to_i %>
+<% pmin = @performances.min_by{|d| d[:performance].to_i}[:performance].to_i %>
+<% pmax = @performances.max_by{|d| d[:performance].to_i}[:performance].to_i %>
+<% dmin = @performances.min_by{|d| d[:date].to_i}[:date].to_i %>
+<% dmax = @performances.max_by{|d| d[:date].to_i}[:date].to_i %>
+<% ymin = [rmin, pmin].min %>
+<% ymax = [rmax, pmax].max %>
+<% @performances.sort_by!{|d| d[:date]} %>
+
+var jsdata = [];
+<% @performances.each do |d| %>
+<% puts d %>
+jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%>"]);
+<% end %>
+
+var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
+
+var format = d3.time.format("%Y%m%d");
+
+x = d3.time.scale().domain([format.parse("<%=dmin%>"), format.parse("<%=dmax%>")]).range([0, 800]);
+y = d3.scale.linear().domain([<%=(ymax == ymin) ? ymax + 40 : ymax%>, <%=(ymax == ymin) ? ymin - 40 : ymin%>]).range([0, 600]);
+
+var xAxis = d3.svg.axis().orient("bottom").scale(x).ticks(10).tickPadding(3).tickFormat(d3.time.format("%b %y"));
+var yAxis = d3.svg.axis().orient("left").scale(y).ticks(15).tickPadding(3);
+
+var perfxpos = ( ( (600 / (<%= pmax - pmin %>) ) * <%= pmax %> ) + 18);
+var ratexpos = ( ( (600 / (<%= rmax - rmin %>) ) * <%= rmax %> ) + 18);
+
+svg.append("g").attr("class","x axis").call(xAxis)
+	.attr("transform","translate(60, " + ((Math.max(ratexpos, perfxpos) > 614) ? 614 : Math.max(ratexpos, perfxpos)) + ")");
+svg.append("g").attr("class","y axis").call(yAxis).attr("transform","translate(60, 20)");
+		
+svg.selectAll(".x.axis").call(xAxis);
+svg.selectAll(".y.axis").call(yAxis);
+
+var perfline = d3.svg.line()
+    .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
+						min = (+format.parse("<%=dmin%>"))/1000;
+						n   = +format.parse(d[0].toString())/1000;
+						return (800 / (max - min)) * (n - min) + 60
+					})
+    .y(function(d) { return (<%= pmax == pmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 18;})
+    .interpolate("linear");
+var rateline = d3.svg.line()
+    .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
+						min = (+format.parse("<%=dmin%>"))/1000;
+						n   = +format.parse(d[0].toString())/1000;
+						return (800 / (max - min)) * (n - min) + 60
+					})
+	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[2] - <%= ymin %>)) + 18;})
+	.interpolate("linear");
+var perfpath = svg.append("svg:path").attr("d", perfline(jsdata)).style("stroke", "blue").style("stroke-width", 2).style("fill", "none");
+var ratepath = svg.append("svg:path").attr("d", rateline(jsdata)).style("stroke", "red").style("stroke-width", 2).style("fill", "none");
+
+svg.selectAll("circle")
+	.data(jsdata)
+	.enter()
+	.append("circle")
+	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
+								min = (+format.parse("<%=dmin%>"))/1000;
+								n   = +format.parse(d[0].toString())/1000;
+								return (800 / (max - min)) * (n - min) + 60
+					})
+	.attr("cy", function(d){
+		return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[2] - <%= ymin %>)) + 20;})
+	.attr("r", 5).style("fill", "red")
+	.style("fill-opacity", 0.5)
+	.on("click", function(d){alert(d[3] +"\n" + format.parse(d[0].toString()).toDateString() + "\nRating: " + d[2] + "\nPerformance: " + d[1])});
+svg.selectAll("circleTwo")
+	.data(jsdata)
+	.enter()
+	.append("circle")
+	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
+								min = (+format.parse("<%=dmin%>"))/1000;
+								n   = +format.parse(d[0].toString())/1000;
+								return (800 / (max - min)) * (n - min) + 60
+					})
+	.attr("cy", function(d){console.log(d[1]); console.log(600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 20);
+		return (<%= pmax == pmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 20;})
+	.attr("r", 5).style("fill", "blue")
+	.style("fill-opacity", 0.5)
+	.on("click", function(d){alert(d[3] +"\n" + format.parse(d[0].toString()).toDateString() + "\nRating: " + d[2] + "\nPerformance: " + d[1])});
