@@ -7,7 +7,6 @@ jsdata = [];
 <% puts d %>
 jsdata.push(["<%=d[:wdl]%>", <%=d[:rating]%>, <%=d[:delta]%>, "<%=d[:name]%>"]);
 <% end %>
-var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 y = d3.scale.linear().domain([<%=(dmax == dmin) ? dmax + 40 : dmax%>, <%=(dmax == dmin) ? dmin - 40 : dmin%>]).range([0, 600]);
 x = d3.scale.linear().domain([<%=(rmax == rmin) ? rmin - 40 : rmin%>, <%=(rmax == rmin) ? rmax + 40 : rmax%>]).range([0, 800]);
 var xAxis = d3.svg.axis().orient("bottom").scale(x).ticks(15);
@@ -26,5 +25,5 @@ svg.selectAll("circle")
 	.on("click", function(d){alert(d[3] + ": " + d[1] + " vs. " + (d[1] + d[2]))});
 svg.selectAll(".x.axis").call(xAxis);
 svg.selectAll(".y.axis").call(yAxis);
-console.log("Supposedly we're good now");
+
 	

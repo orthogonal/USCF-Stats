@@ -7,8 +7,11 @@
 	    <label><%= radio_button_tag 'type', 'quick' %> Quick</label>
 	</div>
 <% end %>
+<button onclick="grid()" id="grid">Grid</button>
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white; display: none;"></div>
 <script type="text/javascript">
+gridOn = false
+var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 $("#delta").submit(function(){
 	$("#delta").hide();
 	$("#text").html("Loading tournaments for that player");
@@ -67,4 +70,21 @@ $("#delta").submit(function(){
 	})
 	return false;
 });
+function grid(){
+	if (gridOn == false){
+		$("#grid").text("No grid");
+		xAxis.tickSize(-600, 0, 6).tickPadding(9);
+		yAxis.tickSize(-800, 0, 6).tickPadding(9);
+		svg.selectAll(".x.axis").call(xAxis);
+		svg.selectAll(".y.axis").call(yAxis);
+		gridOn = true;
+	} else {
+		$("#grid").text("Grid");
+		xAxis.tickSize(0, 0, 6).tickPadding(9);
+		yAxis.tickSize(0, 0, 6).tickPadding(9);
+		svg.selectAll(".x.axis").call(xAxis);
+		svg.selectAll(".y.axis").call(yAxis);
+		gridOn = false;
+	}
+}
 </script>
