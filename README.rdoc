@@ -76,3 +76,23 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
 10/10:
  -Usability testing, someone noticed a major bug in the deltas chart in later versions of Firefox.
  -Opened issue, found solution and fixed it.
+10/11:
+ -Busy watching the debate
+10/12:
+ -Busy doing other things
+10/13:
+ -Did some research and discovered locally weighted logistic regression
+ -Read Ph.D thesis paper and tried to implement a library for the algorithm in Ruby
+ -Got irritated with poorly written paper
+ -Made the deltas example a collection of AJAX calls similar to the demo example
+ -UI/UX changes to the deltas example
+10/14:
+ -Fixed a defect in the deltas page
+ -UI/UX changes to deltas page
+ -Looked up the mathematical papers behind the USCF rating system to get a better understanding of it
+ -Opened up the JavaScript for the performance calculator on the USCF website and read it
+ -Implemented a binary search algorithm similar to that on the USCF website in Ruby to calculate performances
+ -Learned how to do line charts in D3JS
+ -Learned how to do time scales in D3JS
+ -Built a line chart that shows performance ratings and regular ratings over time
+ -Added buttons to deltas and performance charts to add gridlines.
