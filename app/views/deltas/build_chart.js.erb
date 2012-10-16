@@ -2,6 +2,7 @@
 <% rmax = @data.max_by{|d| d[:rating].to_i}[:rating].to_i %>
 <% dmin = @data.min_by{|d| d[:delta].to_i}[:delta].to_i %>
 <% dmax = @data.max_by{|d| d[:delta].to_i}[:delta].to_i %>
+<% @data.sort_by!{|d| d[:rating].to_i} %>
 jsdata = [];
 <% @data.each do |d| %>
 <% puts d %>
@@ -20,9 +21,16 @@ svg.selectAll("circle")
 	.append("circle")
 	.attr("cx", function(d){return (<%= rmax == rmin %>) ? 400 : ((800 / (<%= rmax - rmin %>)) * (d[1] - <%=rmin%>) + 60);})
 	.attr("cy", function(d){return (<%= dmax == dmin %>) ? 300 : 600 - ((600 / (<%= dmax - dmin %>)) * (d[2] - <%= dmin %>)) + 20;})
+	.on("click", function(d){alert(d[3] + ": " + d[1] + " vs. " + (d[1] + d[2]))})
+	.on("mouseover", function(d){d3.select(this).transition().duration(200).attr("r", 10).style("fill-opacity", 1).style("z-index", 1)})
+	.on("mouseout", function(d){d3.select(this).transition().duration(200).attr("r", 5).style("fill-opacity", 0.5).style("z-index", 0)})
+	.attr("r", 50)
+	.attr("fill-opacity", 0)
+	.transition()
+	.delay(function(d, i){return 100 + (1000 * (i / jsdata.length))})
 	.attr("r", 5).style("fill", function(d){return d[0] == 'L' ? "red" : ((d[0] == 'W') ? "green" : "blue");})
 	.style("fill-opacity", 0.5)
-	.on("click", function(d){alert(d[3] + ": " + d[1] + " vs. " + (d[1] + d[2]))});
+	
 svg.selectAll(".x.axis").call(xAxis);
 svg.selectAll(".y.axis").call(yAxis);
 
