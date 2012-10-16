@@ -79,8 +79,7 @@ svg.selectAll("circleTwo")
 								n   = +format.parse(d[0].toString())/1000;
 								return (800 / (max - min)) * (n - min) + 60
 					})
-	.attr("cy", function(d){console.log(d[1]); console.log(600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 20);
-		return (<%= pmax == pmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 20;})
+	.attr("cy", function(d){return (<%= pmax == pmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 20;})
 	.transition()
 	.delay(function(d, i){return 100 + (1000 * (i / jsdata.length));})
 	.attr("r", 5).style("fill", "blue")
