@@ -6,7 +6,7 @@
 	    <label><%= radio_button_tag 'type', 'quick' %> Quick</label>
 	</div>
 <% end %>
-
+<div id="text">Text goes here</div>
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white;"></div>
 <button onclick="grid()" id="grid">Grid</button>
 <button onclick="curvy()" id="curvy">Curvy</button>
@@ -17,12 +17,65 @@ var curvyOn = false;
 $("#perf").submit(function(){
 	$("#perf").hide();
 	var uscf_id = $("#uscf_id").val();
-	$.ajax({
+	/*$.ajax({
 		type : 'POST',
 		url : '/performance_chart',
 		data : {uscf_id: uscf_id, type: $("#type_regular").attr("checked") ? 'regular' : 'quick'},
 	    dataType : 'script'
 	});
+	return false;*/
+	
+	
+	
+	$.ajax({
+		type : 'GET',
+		url : '/perf_history',
+		data : {uscf_id: uscf_id, type: $("#type_regular").attr("checked") ? 'regular' : 'quick'},
+	    dataType : 'json',
+	  	error : function(){
+			alert("There's an error!  e-mail acl68@case.edu");
+		},
+		success : function(data){
+			if (!data){
+				$("#delta").show();
+				return; //There's an error
+			}
+			numTournaments = data.length;
+			if (numTournaments == 0){
+				$("#delta").show();
+				return;	//No tournament history
+			}
+			
+			results = [];
+			
+			j = 0;
+			for (i = 0; i < numTournaments; i++){
+				$.ajax({
+					type : 'GET',
+					url : '/perf_results',
+					data : {uscf_id: uscf_id, rating: data[i].rating, tournament: data[i].id, section: data[i].section, name: data[i].name, date: data[i].date},
+					dataType : 'json',
+					error : function(){
+						alert("There's an error!  e-mail acl68@case.edu");
+					},
+					success : function(data2){
+						results = results.concat(data2);
+						j++
+						$("text").html(j + "/" + numTournaments)
+						//$("#text").html("Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />Tournament: " + j + "/" + numTournaments);
+						if (j == numTournaments){
+							$.ajax({
+								type : 'POST',
+								url : '/performance_chart',
+								data : {results: results},
+								dataType: 'script'
+							});
+						}
+					}
+				})
+			}
+		}
+	})
 	return false;
 });
 		

@@ -14,6 +14,8 @@ Uscfstats::Application.routes.draw do
   match "/rating_history", :to => "deltas#rating_history"
   match "/opp_results", :to => "deltas#opp_results"
   match "/performance", :to => "performance#index"
+  match "/perf_history", :to => "performance#tournament_history"
+  match "/perf_results", :to => "performance#performance_result"
   match "/performance_chart", :to => "performance#build_chart"
 
   # The priority is based upon order of creation:
