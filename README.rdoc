@@ -96,3 +96,8 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Learned how to do time scales in D3JS
  -Built a line chart that shows performance ratings and regular ratings over time
  -Added buttons to deltas and performance charts to add gridlines.
+10/15:
+ -Found out there's a tiny book on D3JS, read about fifty pages of it
+ -Added some animations and hovers to the charts
+10/16:
+ -Finished D3JS book

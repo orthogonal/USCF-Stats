@@ -15,6 +15,7 @@ var yAxis = d3.svg.axis().orient("left").scale(y).ticks(15);
 var xpos = ( ( (600 / (<%= dmax - dmin %>) ) * <%= dmax %> ) + 18);
 svg.append("g").attr("class","x axis").call(xAxis).attr("transform","translate(60, " + ((xpos > 614) ? 614 : xpos) + ")");
 svg.append("g").attr("class","y axis").call(yAxis).attr("transform","translate(60, 20)");
+
 svg.selectAll("circle")
 	.data(jsdata)
 	.enter()

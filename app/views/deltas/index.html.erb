@@ -73,17 +73,13 @@ $("#delta").submit(function(){
 function grid(){
 	if (gridOn == false){
 		$("#grid").text("No grid");
-		xAxis.tickSize(-600, 0, 6).tickPadding(9);
-		yAxis.tickSize(-800, 0, 6).tickPadding(9);
-		svg.selectAll(".x.axis").call(xAxis);
-		svg.selectAll(".y.axis").call(yAxis);
+		svg.selectAll(".x line").attr("y2", 600 - y(0)).attr("y1", -1 * y(0));
+		svg.selectAll(".y line").attr("x2", 800).attr("x1", 0);
 		gridOn = true;
 	} else {
 		$("#grid").text("Grid");
-		xAxis.tickSize(0, 0, 6).tickPadding(9);
-		yAxis.tickSize(0, 0, 6).tickPadding(9);
-		svg.selectAll(".x.axis").call(xAxis);
-		svg.selectAll(".y.axis").call(yAxis);
+		svg.selectAll(".x line").attr("y2", 0).attr("y1", 6);
+		svg.selectAll(".y line").attr("x2", 0).attr("x1", 6);
 		gridOn = false;
 	}
 }
