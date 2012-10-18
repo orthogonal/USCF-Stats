@@ -1,0 +1,65 @@
+<div id="everything" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: black;"></div>
+<script type="text/javascript">
+	var svg = d3.select("#everything").append("svg").attr("width", "100%").attr("height", "100%");
+	info1 = svg.append("text").attr("transform", "translate(20, 20)").style("fill", "white");
+	info2 = svg.append("text").attr("transform", "translate(20, 35)").style("fill", "white");
+	var players = []
+	var links = []
+	<% for i in 0...@results.length do %>
+		players.push({"id": <%= @results[i][i][0] %>, "name": "<%= @results[i][i][1] %>", "score": <%= @results[i][i][2] %>})
+		<% for j in 0...@results[i].length do %>
+			<% if ((i != j) && @results[i][j] != 99) %>
+				links.push({"source" : <%= i %>, "target" : <%= j %>, "total" : <%= @results[i][j] %>});
+			<% end %>
+		<% end %>
+	<% end %>
+	max = 0;
+	for (var i = 0; i < players.length; i++){
+		console.log(players[i].score)
+		console.log("MAX: " + max)
+		if (players[i].score > max)
+			max = players[i].score
+	}
+	var node = svg.selectAll("circle").data(players).enter().append("circle").attr("r", 8)
+		.style("fill", function(d){console.log((255 * (1 - (d.score / max)))); console.log((255 * (d.score / max))); return "rgb(" + Math.floor(255 * (1 - (d.score / max))) + ", 0, " + Math.floor(255 * (d.score / max)) + ")"})
+		.style("stroke", "#555555").style("stroke-width", 1);
+	var link = svg.selectAll("line").data(links).enter().append("line").style("fill", "none").style("stroke-width", 2).style("stroke", "white");
+	var force = d3.layout.force().charge(-400).linkDistance(200).size([800, 600]).nodes(players).links(links).start()
+	force.on("tick", function(){
+		link.attr("x1", function(d) { return d.source.x })
+			.attr("y1", function(d) { return d.source.y })
+		    .attr("x2", function(d) { return d.target.x })
+		    .attr("y2", function(d) { return d.target.y });
+		
+		node.attr("cx", function(d) { return d.x; })
+	        .attr("cy", function(d) { return d.y; });
+		node.on("click", function(d){ 
+			info1.text(d.id);
+			info2.text(d.name);
+			for (i = 0; i < link.length; i++){
+				link.style("stroke", function(e){
+					if (e.source.x == d.x){	// Coming from this node - the node is the row - positive scores are good
+						if (e.total > 0)
+							return "green"
+						else if (e.total < 0)
+							return "red"
+						else
+							return "blue"
+					} else if (e.target.x == d.x){
+						if (e.total > 0)
+							return "red"
+						else if (e.total < 0)
+							return "green"
+						else
+							return "blue"
+					}
+					return "white"
+				})
+			}
+		})
+	});
+	node.call(force.drag);
+	console.log("hi");
+	console.log(players);
+	console.log(links);
+</script>

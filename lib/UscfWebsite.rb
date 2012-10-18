@@ -8,6 +8,51 @@ class UscfWebsite
   QUICK = 1
   ALL = 2
   
+  def self.all_games_in_tournament(tournament_id, section, type)
+    url = "http://www.uschess.org/assets/msa_joomla/XtblMain.php?#{tournament_id}.#{section}"
+    doc = Nokogiri::HTML(open(url))
+    crosstable = doc.search("pre").inner_html
+    rows = crosstable.split('<a href="XtblPlr.php?')
+    rows.shift
+    num_players = rows.length
+    results = Array.new(num_players){ Array.new(num_players) { Array.new() } }
+    rows.each do |row|
+      place = row.scan(/>\d+</).first.scan(/\d+/).first.to_i
+      id = row.scan(/\?\d{8}">/).first.scan(/\d+/).first.to_i
+      name = row.scan(/>[A-Z]+[^<]+</).first.scan(/[A-Z]+[^<]+/).first
+      score = row.scan(/a>[^|]+\|\d+\.\d+/)
+      puts "SCORE: #{score}"
+      score = score.first.scan(/\d+\.\d+/).first.to_f
+      games = row.scan(/\|[WDL]\D+\d{1,4}/)
+      games.each do |game|
+        results[place - 1][place - 1] = [id, name, score]
+        res = game.scan(/[WDL]/).first
+        opp = game.scan(/\d+/).first.to_i
+        results[place - 1][opp - 1] << res
+      end
+    end
+    for i in 0...results.length do
+      for j in 0...results[i].length do
+        if (i != j)
+          total = 0
+          if (results[i][j].length == 0)
+            results[i][j] = 99  # Impossible result
+            next
+          end
+          results[i][j].each do |wdl|
+            if (wdl == 'W')
+              total += 1
+            elsif (wdl == 'L')
+              total -= 1
+            end
+          end
+          results[i][j] = total
+        end
+      end
+    end
+    return results
+  end
+  
   def self.get_player_name_from_id(id)
     doc = Nokogiri::HTML(open("http://main.uschess.org/assets/msa_joomla/MbrDtlMain.php?#{id}"))
     header = doc.at_css("font b")

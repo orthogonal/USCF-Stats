@@ -1,5 +1,7 @@
 Uscfstats::Application.routes.draw do
   
+  get "wpw/index"
+
   get "performance/index"
 
   get "deltas/index"
@@ -17,6 +19,7 @@ Uscfstats::Application.routes.draw do
   match "/perf_history", :to => "performance#tournament_history"
   match "/perf_results", :to => "performance#performance_result"
   match "/performance_chart", :to => "performance#build_chart"
+  match "/wpw", :to => "wpw#index"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
