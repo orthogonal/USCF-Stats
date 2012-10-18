@@ -20,6 +20,7 @@ Uscfstats::Application.routes.draw do
   match "/perf_results", :to => "performance#performance_result"
   match "/performance_chart", :to => "performance#build_chart"
   match "/wpw", :to => "wpw#index"
+  match "/tournament_graph", :to => "wpw#build_graph"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
