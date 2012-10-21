@@ -76,7 +76,10 @@ $("#perf").submit(function(){
 						alert("There's an error!  e-mail acl68@case.edu");
 					},
 					success : function(data2){
-						results = results.concat(data2);
+						if (data2 != null)
+							results = results.concat(data2);
+						console.log(data2)
+						console.log(data2 != null)
 						j++
 						$("text").html(j + "/" + numTournaments)
 						//$("#text").html("Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />Tournament: " + j + "/" + numTournaments);

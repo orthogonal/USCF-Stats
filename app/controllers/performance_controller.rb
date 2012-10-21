@@ -29,6 +29,10 @@ class PerformanceController < ApplicationController
     tourn_result.each do |row|
       results << {:wdl => row[:wdl], :opp => (session[:type] == UscfWebsite::REGULAR ? row[:regular].to_i : row[:quick].to_i)}
     end
+    if (tourn_result.length == 0)
+      render :js => {}
+      return
+    end
     performances = {:name => params[:name], :date => params[:date], :performance => UscfMath.performance(results), :rating => params[:rating]}
     render :js => performances.to_json
   end
