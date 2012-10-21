@@ -1,3 +1,9 @@
+<% def date_int(date)
+  date = date.to_s
+  return Date.new(date[0, 4].to_i, date[4, 2].to_i, date[6, 2].to_i).mjd
+end %>
+
+
 <% rmin = @performances.min_by{|d| d[:rating].to_i}[:rating].to_i %>
 <% rmax = @performances.max_by{|d| d[:rating].to_i}[:rating].to_i %>
 <% pmin = @performances.min_by{|d| d[:performance].to_i}[:performance].to_i %>
@@ -10,9 +16,9 @@
 
 var jsdata = [];
 <% @performances.each do |d| %>
-<% puts d %>
-jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%>"]);
+jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%>", <%=@theta[0] + (d[:rating].to_i * @theta[1]) + ((date_int(d[:date]) - date_int(dmin)) * @theta[2])%>]);
 <% end %>
+console.log(jsdata);
 
 var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 
@@ -66,7 +72,7 @@ svg.selectAll("circle")
 							 info3.text("Rating: " + d[2]);
 							 info4.text("Performance: " + d[1]);
 							})
-	.attr("r", 10).style("fill", "FF8888")
+	.attr("r", 10).style("fill", "#FF8888")
 	.on("mouseover", function(d){d3.select(this).transition().duration(200).style("fill", "#FF8888").attr("r", 9).style("z-index", 1)})
 	.on("mouseout", function(d){d3.select(this).transition().duration(200).style("fill", "#FF2222").attr("r", 5).style("z-index", 0)})
 	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
@@ -89,7 +95,7 @@ svg.selectAll("circleTwo")
 							 info3.text("Rating: " + d[2]);
 							 info4.text("Performance: " + d[1]);
 							})
-	.attr("r", 10).style("fill", "8888FF")
+	.attr("r", 10).style("fill", "#8888FF")
 	.on("mouseover", function(d){d3.select(this).transition().duration(200).style("fill", "#8888FF").attr("r", 9).style("z-index", 1)})
 	.on("mouseout", function(d){d3.select(this).transition().duration(200).style("fill", "#2222FF").attr("r", 5).style("z-index", 0)})
 	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
@@ -102,3 +108,15 @@ svg.selectAll("circleTwo")
 	.delay(function(d, i){return 100 + (1000 * (i / jsdata.length));})
 	.attr("r", 5).style("fill", "#2222FF")
 	.style("stroke", "#000055").style("stroke-width", 2);
+svg.selectAll("circleThree")
+	.data(jsdata)
+	.enter()
+	.append("circle")
+	.on("click", function(d){info1.text(d[4])})
+	.attr("r", 10).style("fill", "#00FF00")
+	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
+								min = (+format.parse("<%=dmin%>"))/1000;
+								n   = +format.parse(d[0].toString())/1000;
+								return (800 / (max - min)) * (n - min) + 60
+					})
+	.attr("cy", function(d){return 600 - ((600 / (<%= ymax - ymin%>)) * (d[4] - <%= ymin %>)) + 20;})

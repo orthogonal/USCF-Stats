@@ -1,6 +1,7 @@
 class PerformanceController < ApplicationController
   require "UscfWebsite"
   require "UscfMath"
+  require "LinearRegression"
   
   def index
     render :action => "index"
@@ -35,8 +36,21 @@ class PerformanceController < ApplicationController
   def build_chart
     @performances = params[:results].to_hash.map{|key, value| value}
     @performances.map!{|record| record.symbolize_keys}
+    mindate = @performances.min_by{|d| d[:date].to_i}[:date].to_i
+    lr = LinearRegression.new
+    
+    lr.training_data[:in] = @performances.map{|record| puts "#{date_int(record[:date])} - #{date_int(mindate)} = #{date_int(record[:date]) - date_int(mindate)}"; [record[:rating].to_i, date_int(record[:date]) - date_int(mindate)]}
+    lr.training_data[:out] = @performances.map{|record| [record[:performance].to_i]}
+    @theta = lr.normal_equation()
+    puts @theta.map!{|t| t.first.to_f}
+    
     respond_to do |format|
        format.js {}
      end
+  end
+  
+  def date_int(date)
+    date = date.to_s
+    return Date.new(date[0, 4].to_i, date[4, 2].to_i, date[6, 2].to_i).mjd
   end
 end

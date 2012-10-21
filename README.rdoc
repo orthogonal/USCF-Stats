@@ -106,3 +106,9 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
 10/17:
  -Made the performance chart example a collection of AJAX calls
  -Used D3JS's algorithms to make a force-directed graph to represent the results of a tournament
+10/18:
+ -Busy doing other things
+10/19:
+ -Busy doing other things
+10/20:
+ -
