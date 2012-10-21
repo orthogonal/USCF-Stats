@@ -1,5 +1,5 @@
 class LinearRegression
-  require 'Matrix'
+  require 'matrix'
   
   attr_accessor :training_data
   
