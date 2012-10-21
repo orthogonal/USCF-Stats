@@ -1,6 +1,6 @@
 <% def date_int(date)
   date = date.to_s
-  return Date.new(date[0, 4].to_i, date[4, 2].to_i, date[6, 2].to_i).mjd
+  return (Date.new(date[0, 4].to_i, date[4, 2].to_i, date[6, 2].to_i) - Date.new(1970, 01, 01)).to_i
 end %>
 
 
@@ -13,12 +13,17 @@ end %>
 <% ymin = [rmin, pmin].min %>
 <% ymax = [rmax, pmax].max %>
 <% @performances.sort_by!{|d| d[:date]} %>
+var theta = <%=@theta%>
+var mindate = <%=date_int(dmin)%>
+console.log(theta);
 
 var jsdata = [];
 <% @performances.each do |d| %>
-jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%>", <%=@theta[0] + (d[:rating].to_i * @theta[1]) + ((date_int(d[:date]) - date_int(dmin)) * @theta[2])%>]);
+jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%>", <%=(@theta != nil) ? @theta[0] + (d[:rating].to_i * @theta[1]) + ((date_int(d[:date]) - date_int(dmin)) * @theta[2]) : 0%>]);
 <% end %>
 console.log(jsdata);
+
+$("#text").html(<% if @theta != nil then %>"<%=@theta[0]%> + <%=@theta[1]%>(rating) + <%=@theta[2]%>(day)"<% else %> "" <% end %>);
 
 var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 
@@ -108,15 +113,14 @@ svg.selectAll("circleTwo")
 	.delay(function(d, i){return 100 + (1000 * (i / jsdata.length));})
 	.attr("r", 5).style("fill", "#2222FF")
 	.style("stroke", "#000055").style("stroke-width", 2);
-svg.selectAll("circleThree")
-	.data(jsdata)
-	.enter()
-	.append("circle")
-	.on("click", function(d){info1.text(d[4])})
-	.attr("r", 10).style("fill", "#00FF00")
-	.attr("cx", function(d){ 	max = (+format.parse("<%=dmax%>"))/1000;
-								min = (+format.parse("<%=dmin%>"))/1000;
-								n   = +format.parse(d[0].toString())/1000;
-								return (800 / (max - min)) * (n - min) + 60
+<% if (@theta) %>
+var mlline = d3.svg.line()
+    .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
+						min = (+format.parse("<%=dmin%>"))/1000;
+						n   = +format.parse(d[0].toString())/1000;
+						return (800 / (max - min)) * (n - min) + 60
 					})
-	.attr("cy", function(d){return 600 - ((600 / (<%= ymax - ymin%>)) * (d[4] - <%= ymin %>)) + 20;})
+	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[4] - <%= ymin %>)) + 18;})
+	.interpolate("linear");
+var mlpath = svg.append("svg:path").attr("d", mlline(jsdata)).style("stroke", "green").style("stroke-width", 3).style("fill", "none");
+<% end %>

@@ -34,15 +34,37 @@ class PerformanceController < ApplicationController
   end
   
   def build_chart
+    puts "PARAMETERS: #{params}"
     @performances = params[:results].to_hash.map{|key, value| value}
     @performances.map!{|record| record.symbolize_keys}
     mindate = @performances.min_by{|d| d[:date].to_i}[:date].to_i
+    
     lr = LinearRegression.new
     
-    lr.training_data[:in] = @performances.map{|record| puts "#{date_int(record[:date])} - #{date_int(mindate)} = #{date_int(record[:date]) - date_int(mindate)}"; [record[:rating].to_i, date_int(record[:date]) - date_int(mindate)]}
-    lr.training_data[:out] = @performances.map{|record| [record[:performance].to_i]}
-    @theta = lr.normal_equation()
-    puts @theta.map!{|t| t.first.to_f}
+    if params[:ml] == "true"
+      lr.training_data[:in] = @performances.map{|record| tmp = Array.new; if params[:ml_rating] == "true" then tmp << record[:rating].to_i end; if params[:ml_date] == "true" then tmp << (date_int(record[:date]) - date_int(mindate)) end; tmp}
+      lr.training_data[:out] = @performances.map{|record| [record[:performance].to_i]}
+      theta = lr.normal_equation()
+      puts theta.map!{|t| t.first.to_f}
+      
+      @theta = [theta[0]]
+      i = 1
+      if params[:ml_rating] == "true"
+        @theta[1] = theta[i]
+        i += 1
+      else
+        @theta[1] = 0
+      end
+      if params[:ml_date] == "true"
+        @theta[2] = theta[i]
+        i += 1
+      else
+        @theta[2] = 0
+      end
+    else
+      @theta = nil
+    end
+    puts "THETA: #{theta} AND #{@theta}"
     
     respond_to do |format|
        format.js {}
@@ -51,6 +73,6 @@ class PerformanceController < ApplicationController
   
   def date_int(date)
     date = date.to_s
-    return Date.new(date[0, 4].to_i, date[4, 2].to_i, date[6, 2].to_i).mjd
+    return (Date.new(date[0, 4].to_i, date[4, 2].to_i, date[6, 2].to_i) - Date.new(1970, 01, 01)).to_i
   end
 end

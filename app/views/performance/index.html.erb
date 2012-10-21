@@ -5,15 +5,29 @@
 	    <label><%= radio_button_tag 'type', 'regular', true %> Regular</label>
 	    <label><%= radio_button_tag 'type', 'quick' %> Quick</label>
 	</div>
+	<div id="ml">
+		<label><%= check_box("ml", "active", {}, "yes", "no")%>Machine Learning</label>
+		<label><%= check_box("ml", "rating", {}, "yes", "no")%>Use Rating</label>
+		<label><%= check_box("ml", "date", {}, "yes", "no")%>Use Date</label>
+	</div>
 <% end %>
 <div id="text">Text goes here</div>
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white;"></div>
 <button onclick="grid()" id="grid">Grid</button>
 <button onclick="curvy()" id="curvy">Curvy</button>
+<%= form_tag({}, {:id => "pred_performance"}) do %>
+	Rating: <%= text_field_tag "pred_rating" %>
+	Days from today: <%= text_field_tag "pred_date" %>
+	<%= submit_tag "Predict" %>
+<% end %>
 <script type="text/javascript">
 var gridOn = false;
 var curvyOn = false;
 
+$("#pred_performance").submit(function(){
+	alert(	parseFloat(theta[0]) + (   parseFloat($("#pred_rating").val()) * parseFloat(theta[1])  ) + parseFloat(  parseFloat( parseInt((new Date).getTime() / 86400000) + parseInt($("#pred_date").val()) - mindate ) * parseFloat(theta[2])  ));
+	return false;
+})
 $("#perf").submit(function(){
 	$("#perf").hide();
 	var uscf_id = $("#uscf_id").val();
@@ -24,8 +38,11 @@ $("#perf").submit(function(){
 	    dataType : 'script'
 	});
 	return false;*/
-	
-	
+	var ml = [false, false];
+	if($("#ml_active").is(':checked')){
+		ml[0] = $("#ml_rating").is(':checked') ? true : false;
+		ml[1] = $("#ml_date").is(':checked') ? true : false;
+	}
 	
 	$.ajax({
 		type : 'GET',
@@ -67,7 +84,7 @@ $("#perf").submit(function(){
 							$.ajax({
 								type : 'POST',
 								url : '/performance_chart',
-								data : {results: results},
+								data : {results: results, ml: (ml[0] || ml[1]) ? "true" : "false", ml_rating: ml[0], ml_date: ml[1]},
 								dataType: 'script'
 							});
 						}

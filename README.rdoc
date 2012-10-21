@@ -111,4 +111,7 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
 10/19:
  -Busy doing other things
 10/20:
- -
+ -Studied linear regression
+ -Built a structure to add a linear regression model to the performance chart using the normal equation
+ -Let users choose features
+ -Users can choose arbitrary data and use machine learning to get an expected performance
