@@ -1,38 +1,40 @@
-<% rmin = @result.min_by{|d| d[:rating].to_i}[:rating].to_i %>
-<% rmax = @result.max_by{|d| d[:rating].to_i}[:rating].to_i %>
-<% xmin = @result.min_by{|d| d[:x].to_i}[:x].to_i %>
-<% xmax = @result.max_by{|d| d[:x].to_i}[:x].to_i %>
+<% rmin = @result.map{|c| c[:data].min_by{|d| d[:rating].to_i}[:rating].to_i}.min %>
+<% rmax = @result.map{|c| c[:data].max_by{|d| d[:rating].to_i}[:rating].to_i}.max %>
+<% xmin = @result.map{|c| c[:data].min_by{|d| d[:x].to_i}[:x].to_i}.min %>
+<% xmax = @result.map{|c| c[:data].max_by{|d| d[:x].to_i}[:x].to_i}.max %>
+<% puts "RMIN: #{rmin} RMAX: #{rmax} XMIN: #{xmin} XMAX: #{xmax}"%>
 
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white;"></div>
 <script type="text/javascript">
-	var jsdata = [];
-	<% @result.each do |d| %>
-		jsdata.push([<%=d[:x]%>, <%=d[:performance]%>, <%=d[:rating]%>]);
-	<% end %>
-	console.log(jsdata);
-	
 	var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 	
-	x = d3.scale.linear().domain([<%=xmin%>, <%=(xmax == xmin) ? xmax + 40 : xmax%>]).range([800, 0]);
+	x = d3.scale.linear().domain([<%=xmin%>, <%=(xmax == xmin) ? xmax + 40 : xmax%>]).range([0, 800]);
 	y = d3.scale.linear().domain([<%=(rmax == rmin) ? rmax + 40 : rmax%>, <%=(rmax == rmin) ? rmin - 40 : rmin%>]).range([0, 600]);
 
 	var xAxis = d3.svg.axis().orient("bottom").scale(x).ticks(10).tickPadding(3)
 	var yAxis = d3.svg.axis().orient("left").scale(y).ticks(15).tickPadding(3);
 
-	svg.append("g").attr("class","x axis").call(xAxis).attr("transform","translate(60, 620)");
+	svg.append("g").attr("class","x axis").call(xAxis).attr("transform","translate(60, 616)");
 	svg.append("g").attr("class","y axis").call(yAxis).attr("transform","translate(60, 20)");
 	
-	svg.selectAll("circle")
-		.data(jsdata)
-		.enter()
-		.append("circle")
-		.attr("r", 5).style("fill", "#8888FF")
-		.attr("cx", function(d){ 	max = <%=xmax%>;
-									min = <%=xmin%>;
-									n   = d[0];
-									return (800 / (max - min)) * (n - min) + 60
-						})
-		.attr("cy", function(d){
-			return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= rmax - rmin %>)) * (d[2] - <%= rmin %>)) + 20;})
-		.style("stroke", "#000055").style("stroke-width", 2);
+	colors = ["red", "green", "blue", "black", "magenta", "pink"]
+	
+	<% for i in 0...@result.length %>
+		var jsdata = [];
+		<% @result[i][:data].each do |d| %>
+			<% puts @result[i] %>
+			jsdata.push([<%=d[:x]%>, <%=d[:performance]%>, <%=d[:rating]%>]);
+		<% end %>
+		console.log(jsdata);
+	
+		var firstline = d3.svg.line()
+		    .x(function(d) { 	max = <%=xmax%>;
+								min = <%=xmin%>;
+								n   = d[0];
+								return (800 / (max - min)) * (n - min) + 60
+							})
+		    .y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= rmax - rmin %>)) * (d[2] - <%= rmin %>)) + 20;})
+		    .interpolate("linear");
+		svg.append("svg:path").attr("d", firstline(jsdata)).style("stroke", colors[<%=i%>]).style("stroke-width", 3).style("fill", "none");
+	<% end %>
 </script>

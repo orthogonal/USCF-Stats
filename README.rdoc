@@ -114,4 +114,10 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Studied linear regression
  -Built a structure to add a linear regression model to the performance chart using the normal equation
  -Let users choose features
- -Users can choose arbitrary data and use machine learning to get an expected performance 
+ -Users can choose arbitrary data and use machine learning to get an expected performance
+10/21:
+ -Fixed a bug, did some testing
+10/22:
+ -Added a new method to the USCFWebsite class to count how many games someone played in a tournament
+ -Started building a chart to show rating/performance vs number of games played
+ -Got a 403 when trying to access the USCFWebsite from my computer...........

@@ -10,10 +10,13 @@ class UscfWebsite
   
   def self.num_games_in_tournament(tournament_id, section, type, uscf_id)
     url = "http://main.uschess.org/assets/msa_joomla/XtblPlr.php?#{tournament_id}-%03d-#{uscf_id}" % section
+    puts url
     doc = Nokogiri::HTML(open(url))
     results = doc.search("td td:nth-child(1)")
-    while (results.first.text.scan(/[WDL]\W*\d{1,6}/).length == 0)
+    if (results.length == 0) then return 0 end  # If a player was in an event and didn't play in any games.
+    while (results.first.text.scan(/[WDL][^A-Za-z(]*\d{1,6}/).length == 0)
       results.shift
+      if (results.length == 0) then return 0 end  # If a player was in an event and didn't play in any games.
     end
     return results.length
   end
