@@ -1,5 +1,5 @@
 class ExperienceController < ApplicationController
-  require 'uscfwebsite'
+  require 'UscfWebsite'
   require 'uscfmath'
   def index
     @result = []
