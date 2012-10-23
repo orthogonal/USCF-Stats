@@ -1,6 +1,6 @@
 class ExperienceController < ApplicationController
   require 'UscfWebsite'
-  require 'uscfmath'
+  require 'UscfMath'
   def index
     @result = []
     ids = [12842311, 13666146, 12895924, 13362808, 12929115]
