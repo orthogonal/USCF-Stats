@@ -8,6 +8,16 @@ class UscfWebsite
   QUICK = 1
   ALL = 2
   
+  def self.num_games_in_tournament(tournament_id, section, type, uscf_id)
+    url = "http://main.uschess.org/assets/msa_joomla/XtblPlr.php?#{tournament_id}-%03d-#{uscf_id}" % section
+    doc = Nokogiri::HTML(open(url))
+    results = doc.search("td td:nth-child(1)")
+    while (results.first.text.scan(/[WDL]\W*\d{1,6}/).length == 0)
+      results.shift
+    end
+    return results.length
+  end
+  
   def self.all_games_in_tournament(tournament_id, section, type)
     url = "http://www.uschess.org/assets/msa_joomla/XtblMain.php?#{tournament_id}.#{section}"
     doc = Nokogiri::HTML(open(url))
