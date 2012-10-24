@@ -14,7 +14,7 @@
 </div>
 <div id="text">Enter a player's ID to see a chart of their performances across history.  Select machine learning to make predictions of future performance.</div>
 
-<div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: black;"></div>
+<div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: black; display: none;"></div>
 
 <button onclick="curvy()" id="curvy">Curvy</button>
 <%= form_tag({}, {:id => "pred_performance"}) do %>
@@ -28,7 +28,6 @@ $("#navigation").val("Performance Analysis");
 var gridOn = false;
 var curvyOn = false;
 $(".onml").hide();
-$("#scatterplot").hide();
 $("#curvy").hide();
 $("#pred_performance").hide();
 $("#ml_active").change(function(){
