@@ -5,16 +5,20 @@ Uscfstats::Application.routes.draw do
   match "/tan_opponents", :to => "interface#tan_opponents"
   match "/tan_complete", :to => "interface#tan_complete"
   match "/tan_resort", :to => "interface#tan_resort"
-  match "/deltas", :to => "deltas#index"
+  
+  match "/upsets", :to => "deltas#index"
   match "/build_chart", :to => "deltas#build_chart"
   match "/rating_history", :to => "deltas#rating_history"
   match "/opp_results", :to => "deltas#opp_results"
-  match "/performance", :to => "performance#index"
+  
+  match "/performances", :to => "performance#index"
   match "/perf_history", :to => "performance#tournament_history"
   match "/perf_results", :to => "performance#performance_result"
   match "/performance_chart", :to => "performance#build_chart"
-  match "/wpw", :to => "wpw#index"
+  
+  match "/matches", :to => "wpw#index"
   match "/tournament_graph", :to => "wpw#build_graph"
+  
   match "/experience", :to => "experience#index"
 
   # The priority is based upon order of creation:
