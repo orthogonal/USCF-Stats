@@ -121,3 +121,8 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Added a new method to the USCFWebsite class to count how many games someone played in a tournament
  -Started building a chart to show rating/performance vs number of games played
  -Got a 403 when trying to access the USCFWebsite from my computer...........
+10/23:
+ -Made some cosmetic changes
+10/24:
+ -Made some more cosmetic changes
+ -Updating routing a bit
