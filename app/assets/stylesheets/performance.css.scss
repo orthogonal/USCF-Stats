@@ -3,5 +3,40 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
  
 line {
-    stroke: black;
+    stroke: #AAAAAA;
+}
+
+.inputArea{
+	font-size: 18pt;
+	width:100%;
+	
+	/* Firefox */
+	display:-moz-box;
+	-moz-box-pack:center;
+	-moz-box-align:center;
+
+	/* Safari and Chrome */
+	display:-webkit-box;
+	-webkit-box-pack:center;
+	-webkit-box-align:center;
+
+	/* W3C */
+	display:box;
+	box-pack:center;
+	box-align:center;
+}
+
+.inputArea input:nth-child(3){
+	-webkit-appearance: button;
+	font-size: 18pt;
+	border-radius: 2px 2px 2px 2px;
+}
+
+.inputArea #uscf_id{
+	width: 130px;
+	font-size: 18pt;
+}
+
+#text{
+	text-align: center;
 }

@@ -68,7 +68,6 @@ class PerformanceController < ApplicationController
     else
       @theta = nil
     end
-    puts "THETA: #{theta} AND #{@theta}"
     
     respond_to do |format|
        format.js {}

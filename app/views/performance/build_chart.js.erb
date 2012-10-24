@@ -13,9 +13,11 @@ end %>
 <% ymin = [rmin, pmin].min %>
 <% ymax = [rmax, pmax].max %>
 <% @performances.sort_by!{|d| d[:date]} %>
-var theta = <%=@theta%>
+var theta = <%=(@theta != nil) ? @theta : []%>
 var mindate = <%=date_int(dmin)%>
-console.log(theta);
+$("#scatterplot").show();
+$("#curvy").show();
+$("#pred_performance").show();
 
 var jsdata = [];
 <% @performances.each do |d| %>
@@ -23,14 +25,14 @@ jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%
 <% end %>
 console.log(jsdata);
 
-$("#text").html(<% if @theta != nil then %>"<%=@theta[0]%> + <%=@theta[1]%>(rating) + <%=@theta[2]%>(day)"<% else %> "" <% end %>);
+<% if @theta != nil then %>$("#text").html("<%=@theta[0]%> + <%=@theta[1]%>(rating) + <%=@theta[2]%>(day)");<% else %> $("#text").hide(); <% end %>
 
 var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 
-info1 = svg.append("text").attr("transform", "translate(70, 40)");
-info2 = svg.append("text").attr("transform", "translate(70, 55)");
-info3 = svg.append("text").attr("transform", "translate(70, 70)");
-info4 = svg.append("text").attr("transform", "translate(70, 85)");
+info1 = svg.append("text").attr("transform", "translate(70, 40)").style("fill", "white");
+info2 = svg.append("text").attr("transform", "translate(70, 55)").style("fill", "white");
+info3 = svg.append("text").attr("transform", "translate(70, 70)").style("fill", "white");
+info4 = svg.append("text").attr("transform", "translate(70, 85)").style("fill", "white");
 
 var format = d3.time.format("%Y%m%d");
 
@@ -75,7 +77,7 @@ svg.selectAll("circle")
 	.on("click", function(d){info1.text(d[3]);
 		 					 info2.text(format.parse(d[0].toString()).toDateString());
 							 info3.text("Rating: " + d[2]);
-							 info4.text("Performance: " + d[1]);
+							 info4.text("Performance: " + d[1].toFixed(2));
 							})
 	.attr("r", 10).style("fill", "#FF8888")
 	.on("mouseover", function(d){d3.select(this).transition().duration(200).style("fill", "#FF8888").attr("r", 9).style("z-index", 1)})
@@ -98,7 +100,7 @@ svg.selectAll("circleTwo")
 	.on("click", function(d){info1.text(d[3]);
 		 					 info2.text(format.parse(d[0].toString()).toDateString());
 							 info3.text("Rating: " + d[2]);
-							 info4.text("Performance: " + d[1]);
+							 info4.text("Performance: " + d[1].toFixed(2));
 							})
 	.attr("r", 10).style("fill", "#8888FF")
 	.on("mouseover", function(d){d3.select(this).transition().duration(200).style("fill", "#8888FF").attr("r", 9).style("z-index", 1)})
@@ -113,6 +115,17 @@ svg.selectAll("circleTwo")
 	.delay(function(d, i){return 100 + (1000 * (i / jsdata.length));})
 	.attr("r", 5).style("fill", "#2222FF")
 	.style("stroke", "#000055").style("stroke-width", 2);
+	
+svg.append("svg:rect").attr("x", 2).attr("y", 1).attr("height", 30).attr("width", 45).style("fill", "#DDDDDD").attr("fill-opacity", 0.9)
+	.on("click", function(){grid()}).style("cursor", "pointer")
+	.on("mouseover", function(){d3.select(this).style("fill", "#DD9999")})
+	.on("mouseout", function(){d3.select(this).style("fill", "#DDDDDD")});
+buttonText = svg.append("text").attr("transform", "translate(10, 20)").style("fill", "#222222")
+	.on("click", function(){grid()}).style("cursor", "pointer")
+	.on("mouseover", function(){d3.select("rect").style("fill", "#DD9999")})
+	.on("mouseout", function(){d3.select("rect").style("fill", "#DDDDDD")});;
+buttonText.text("Grid");
+	
 <% if (@theta) %>
 var mlline = d3.svg.line()
     .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;

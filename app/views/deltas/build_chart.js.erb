@@ -35,4 +35,14 @@ svg.selectAll("circle")
 svg.selectAll(".x.axis").call(xAxis);
 svg.selectAll(".y.axis").call(yAxis);
 
+svg.append("svg:rect").attr("x", 2).attr("y", 1).attr("height", 30).attr("width", 45).style("fill", "#DDDDDD").attr("fill-opacity", 0.9)
+	.on("click", function(){grid()}).style("cursor", "pointer")
+	.on("mouseover", function(){d3.select(this).style("fill", "#DD9999")})
+	.on("mouseout", function(){d3.select(this).style("fill", "#DDDDDD")});
+buttonText = svg.append("text").attr("transform", "translate(10, 20)").style("fill", "#222222")
+	.on("click", function(){grid()}).style("cursor", "pointer")
+	.on("mouseover", function(){d3.select("rect").style("fill", "#DD9999")})
+	.on("mouseout", function(){d3.select("rect").style("fill", "#DDDDDD")});;
+buttonText.text("Grid");
+
 	

@@ -3,7 +3,7 @@ class ExperienceController < ApplicationController
   require 'UscfMath'
   def index
     @result = []
-    ids = [12842311, 13666146, 12895924, 13362808, 12929115]
+    ids = [12842311] #, 13666146, 12895924, 13362808, 12929115
     ids.each do |uscf_id|
       history = UscfWebsite.get_rating_history_from_id(uscf_id, UscfWebsite::REGULAR)
       history.reverse!

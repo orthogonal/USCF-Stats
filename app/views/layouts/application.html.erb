@@ -22,8 +22,53 @@
 </script>
 </head>
 <body>
+	<div id="top">
+		<div id="header">
+			<div id="bishop">
+				<%= image_tag("bishop.png", :size => "60x60", :alt => "USCFstats logo")%>
+			</div>
+			<div id="title">USCF Stats</div>
+			<div id="subtext">
+				By <a href="mailto:acl68@case.edu">Andrew Latham</a>
+			</div>
+			<div id="msalink">
+				<a href="http://www.uschess.org/assets/msa_joomla/MbrLst.php" target="_blank">Player/Event Lookup</a>
+			</div>
+			<div id="dropdown">
+				<select id="navigation">
+					<option id="opt1">Where are they now?</option>
+					<option id="opt2">Upset Graph</option>
+					<option id="opt3">Performance Analysis</option>
+					<option id="opt4">Tournament Match Network</option>
+					<option id="opt5">Experential Development</option>
+				</select>
+			</div>
+			<div id="clearance">&nbsp;</div>
+		</div>
+	</div>
 
 <%= yield %>
 
 </body>
+<script type="text/javascript">
+	$("#navigation").change(function(){
+		switch($("#navigation option:selected").attr("id")){
+			case "opt1":
+				window.location = "/"
+				break;
+			case "opt2":
+				window.location = "/deltas"
+				break;
+			case "opt3":
+				window.location = "/performance"
+				break;
+			case "opt4":
+				window.location = "/wpw"
+				break;
+			case "opt5":
+				window.location = "/experience"
+				break;
+		}
+	});
+</script>
 </html>

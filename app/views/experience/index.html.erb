@@ -6,6 +6,7 @@
 
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white;"></div>
 <script type="text/javascript">
+	$("#navigation").val("Experential Development");
 	var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 	
 	x = d3.scale.linear().domain([<%=xmin%>, <%=(xmax == xmin) ? xmax + 40 : xmax%>]).range([0, 800]);

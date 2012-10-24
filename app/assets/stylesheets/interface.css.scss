@@ -2,48 +2,6 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-body{
-	background: url("bgimg.png");
-	color:  #001800
-}
-
-a{
-	text-decoration: none;
-}
-
-#top{
-	width: 100%;
-	padding-bottom: 12px;
-	border-bottom: 2px solid #002200;
-}
-
-#header{
-	width: 380px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-#title{
-	width: 380px;
-	text-align: center;
-	font-size: 38pt;
-}
-
-#subtext{
-	width: 380px;
-	font-size: 14pt;
-	position: relative;
-}
-
-#andrewLatham{
-	margin-left: 10px;
-}
-
-#comingSoon{
-	position: absolute;
-	right: 10px;
-}
-
 #beta{
 	width: 100%;
 }
@@ -91,9 +49,4 @@ a{
 	border-collapse: collapse;
 	text-align: center;
 	padding: 2px 5px 2px 5px;
-}
-
-.header{
-	cursor: pointer;
-	white-space: nowrap;
 }

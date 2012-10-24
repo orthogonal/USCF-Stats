@@ -1,43 +1,52 @@
-<%= form_tag({}, {:id => "perf"}) do %>
+<h3 style="text-align: center" id="perftitle">Performance Analysis</h3>
+<%= form_tag({}, {:id => "perf", :class => "inputArea"}) do %>
 	USCF ID: <%= text_field_tag "uscf_id" %>
 	<%= submit_tag "Go" %>
 	<div id="options">
 	    <label><%= radio_button_tag 'type', 'regular', true %> Regular</label>
 	    <label><%= radio_button_tag 'type', 'quick' %> Quick</label>
 	</div>
-	<div id="ml">
-		<label><%= check_box("ml", "active", {}, "yes", "no")%>Machine Learning</label>
-		<label><%= check_box("ml", "rating", {}, "yes", "no")%>Use Rating</label>
-		<label><%= check_box("ml", "date", {}, "yes", "no")%>Use Date</label>
-	</div>
 <% end %>
-<div id="text">Text goes here</div>
-<div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: white;"></div>
-<button onclick="grid()" id="grid">Grid</button>
+<div id="ml" class="inputArea">
+	<label><%= check_box("ml", "active", {}, "yes", "no")%>Machine Learning</label>
+	<label class="onml"><%= check_box("ml", "rating", {}, "yes", "no")%>Use Rating</label>
+	<label class="onml"><%= check_box("ml", "date", {}, "yes", "no")%>Use Date</label>
+</div>
+<div id="text">Enter a player's ID to see a chart of their performances across history.  Select machine learning to make predictions of future performance.</div>
+
+<div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: black;"></div>
+
 <button onclick="curvy()" id="curvy">Curvy</button>
 <%= form_tag({}, {:id => "pred_performance"}) do %>
 	Rating: <%= text_field_tag "pred_rating" %>
 	Days from today: <%= text_field_tag "pred_date" %>
 	<%= submit_tag "Predict" %>
 <% end %>
+
 <script type="text/javascript">
+$("#navigation").val("Performance Analysis");
 var gridOn = false;
 var curvyOn = false;
+$(".onml").hide();
+$("#scatterplot").hide();
+$("#curvy").hide();
+$("#pred_performance").hide();
+$("#ml_active").change(function(){
+	if ($(this).is(":checked"))
+		$(".onml").show();
+	else
+		$(".onml").hide();
+});
 
 $("#pred_performance").submit(function(){
 	alert(	parseFloat(theta[0]) + (   parseFloat($("#pred_rating").val()) * parseFloat(theta[1])  ) + parseFloat(  parseFloat( parseInt((new Date).getTime() / 86400000) + parseInt($("#pred_date").val()) - mindate ) * parseFloat(theta[2])  ));
 	return false;
 })
 $("#perf").submit(function(){
-	$("#perf").hide();
+	$(".inputArea").hide();
+	$("#perftitle").hide();
+	$("#text").show().text("Loading...");
 	var uscf_id = $("#uscf_id").val();
-	/*$.ajax({
-		type : 'POST',
-		url : '/performance_chart',
-		data : {uscf_id: uscf_id, type: $("#type_regular").attr("checked") ? 'regular' : 'quick'},
-	    dataType : 'script'
-	});
-	return false;*/
 	var ml = [false, false];
 	if($("#ml_active").is(':checked')){
 		ml[0] = $("#ml_rating").is(':checked') ? true : false;
@@ -54,13 +63,17 @@ $("#perf").submit(function(){
 		},
 		success : function(data){
 			if (!data){
-				$("#delta").show();
-				return; //There's an error
+				$("#text").html("Invalid input");
+				$(".inputArea").show();
+				$("#perftitle").show();
+				return;
 			}
 			numTournaments = data.length;
 			if (numTournaments == 0){
-				$("#delta").show();
-				return;	//No tournament history
+				$("#text").html("That player has no tournament history");
+				$(".inputArea").show();
+				$("#perftitle").show();
+				return;
 			}
 			
 			results = [];
@@ -81,8 +94,7 @@ $("#perf").submit(function(){
 						console.log(data2)
 						console.log(data2 != null)
 						j++
-						$("text").html(j + "/" + numTournaments)
-						//$("#text").html("Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />Tournament: " + j + "/" + numTournaments);
+						$("#text").html("Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />Tournament: " + j + "/" + numTournaments);
 						if (j == numTournaments){
 							$.ajax({
 								type : 'POST',
@@ -103,11 +115,12 @@ $("#perf").submit(function(){
 		
 function grid(){
 	if (gridOn == false){
-		$("#grid").text("No grid");
 		xAxis.tickSize(-600, 0, 6).tickPadding(9);
 		yAxis.tickSize(-800, 0, 6).tickPadding(9);
 		svg.selectAll(".x.axis").call(xAxis);
 		svg.selectAll(".y.axis").call(yAxis);
+		$("line").css("stroke", "white");
+		$("line").css("stroke-dasharray", "4 2");
 		gridOn = true;
 	} else {
 		$("#grid").text("Grid");
