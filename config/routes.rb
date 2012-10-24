@@ -20,6 +20,8 @@ Uscfstats::Application.routes.draw do
   match "/tournament_graph", :to => "wpw#build_graph"
   
   match "/experience", :to => "experience#index"
+  
+  match "*rest" => redirect("/")
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
