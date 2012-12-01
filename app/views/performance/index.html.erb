@@ -5,52 +5,35 @@
 	<div id="options">
 	    <label><%= radio_button_tag 'type', 'regular', true %> Regular</label>
 	    <label><%= radio_button_tag 'type', 'quick' %> Quick</label>
+		<label><%= check_box("extend", "active", {}, "yes", "no")%>Predict future</label>
+		<span id="future"><br />Days in future: <%= text_field_tag "days" %></span>
 	</div>
 <% end %>
-<div id="ml" class="inputArea">
-	<label><%= check_box("ml", "active", {}, "yes", "no")%>Machine Learning</label>
-	<label class="onml"><%= check_box("ml", "rating", {}, "yes", "no")%>Use Rating</label>
-	<label class="onml"><%= check_box("ml", "date", {}, "yes", "no")%>Use Date</label>
-</div>
 <div id="text">Enter a player's ID to see a chart of their performances across history.  Select machine learning to make predictions of future performance.</div>
 
 <div id="scatterplot" style="height: 640px; width: 880px; margin-left: 0px; border: 1px solid black; background-color: black; display: none;"></div>
 
 <button onclick="curvy()" id="curvy">Curvy</button>
-<%= form_tag({}, {:id => "pred_performance"}) do %>
-	Rating: <%= text_field_tag "pred_rating" %>
-	Days from today: <%= text_field_tag "pred_date" %>
-	<%= submit_tag "Predict" %>
-<% end %>
 
 <script type="text/javascript">
 $("#navigation").val("Performance Analysis");
 var gridOn = false;
 var curvyOn = false;
-$(".onml").hide();
 $("#curvy").hide();
-$("#pred_performance").hide();
-$("#ml_active").change(function(){
+$("#future").hide();
+
+$("#extend_active").change(function(){
 	if ($(this).is(":checked"))
-		$(".onml").show();
+		$("#future").show();
 	else
-		$(".onml").hide();
+		$("#future").hide();
 });
 
-$("#pred_performance").submit(function(){
-	alert(	parseFloat(theta[0]) + (   parseFloat($("#pred_rating").val()) * parseFloat(theta[1])  ) + parseFloat(  parseFloat( parseInt((new Date).getTime() / 86400000) + parseInt($("#pred_date").val()) - mindate ) * parseFloat(theta[2])  ));
-	return false;
-})
 $("#perf").submit(function(){
 	$(".inputArea").hide();
 	$("#perftitle").hide();
 	$("#text").show().text("Loading...");
 	var uscf_id = $("#uscf_id").val();
-	var ml = [false, false];
-	if($("#ml_active").is(':checked')){
-		ml[0] = $("#ml_rating").is(':checked') ? true : false;
-		ml[1] = $("#ml_date").is(':checked') ? true : false;
-	}
 	
 	$.ajax({
 		type : 'GET',
@@ -98,7 +81,11 @@ $("#perf").submit(function(){
 							$.ajax({
 								type : 'POST',
 								url : '/performance_chart',
-								data : {results: results, ml: (ml[0] || ml[1]) ? "true" : "false", ml_rating: ml[0], ml_date: ml[1]},
+								data : {results: results, 
+									extend: ($("#extend_active").is(':checked')) ? 
+									((!isNaN(parseFloat($("#days").val())) && isFinite($("#days").val()) &&
+									parseFloat($("#days").val()) >= 0) ? $("#days").val() : "0") 
+																				: "false"},
 								dataType: 'script'
 							});
 						}

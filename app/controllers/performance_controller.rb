@@ -39,35 +39,33 @@ class PerformanceController < ApplicationController
   
   def build_chart
     puts "PARAMETERS: #{params}"
+    @extend = params[:extend]
     @performances = params[:results].to_hash.map{|key, value| value}
     @performances.map!{|record| record.symbolize_keys}
     mindate = @performances.min_by{|d| d[:date].to_i}[:date].to_i
     
-    lr = LinearRegression.new
-    
-    if params[:ml] == "true"
-      lr.training_data[:in] = @performances.map{|record| tmp = Array.new; if params[:ml_rating] == "true" then tmp << record[:rating].to_i end; if params[:ml_date] == "true" then tmp << (date_int(record[:date]) - date_int(mindate)) end; tmp}
-      lr.training_data[:out] = @performances.map{|record| [record[:performance].to_i]}
-      theta = lr.normal_equation()
-      puts theta.map!{|t| t.first.to_f}
-      
-      @theta = [theta[0]]
-      i = 1
-      if params[:ml_rating] == "true"
-        @theta[1] = theta[i]
-        i += 1
-      else
-        @theta[1] = 0
-      end
-      if params[:ml_date] == "true"
-        @theta[2] = theta[i]
-        i += 1
-      else
-        @theta[2] = 0
-      end
-    else
-      @theta = nil
+    x = Array.new
+    perf_y = Array.new
+    rate_y = Array.new
+    for i in 0...@performances.length
+      x[i] = Array.new
+      perf_y[i] = Array.new
+      rate_y[i] = Array.new
+      x[i][0] = Math.log(date_int(@performances[i][:date]) - date_int(mindate) + 1)
+      x[i][1] = x[i][0]**2
+      perf_y[i][0] = @performances[i][:performance].to_i
+      rate_y[i][0] = @performances[i][:rating].to_i
     end
+    
+    @perfLinReg = LinearRegression.new
+    @perfLinReg.training_data[:x] = x.clone
+    @perfLinReg.training_data[:y] = perf_y
+    @perfLinReg.normal_equation
+    
+    @rateLinReg = LinearRegression.new
+    @rateLinReg.training_data[:x] = x.clone
+    @rateLinReg.training_data[:y] = rate_y
+    @rateLinReg.normal_equation
     
     respond_to do |format|
        format.js {}

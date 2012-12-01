@@ -3,7 +3,6 @@
   return (Date.new(date[0, 4].to_i, date[4, 2].to_i, date[6, 2].to_i) - Date.new(1970, 01, 01)).to_i
 end %>
 
-
 <% rmin = @performances.min_by{|d| d[:rating].to_i}[:rating].to_i %>
 <% rmax = @performances.max_by{|d| d[:rating].to_i}[:rating].to_i %>
 <% pmin = @performances.min_by{|d| d[:performance].to_i}[:performance].to_i %>
@@ -13,19 +12,34 @@ end %>
 <% ymin = [rmin, pmin].min %>
 <% ymax = [rmax, pmax].max %>
 <% @performances.sort_by!{|d| d[:date]} %>
-var theta = <%=(@theta != nil) ? @theta : []%>
 var mindate = <%=date_int(dmin)%>
 $("#scatterplot").show();
 $("#curvy").show();
 $("#pred_performance").show();
 
+<% if (@extend != "false") then dmax = ("%04d%02d%02d" % [(Date.today + @extend.to_i).year, (Date.today + @extend.to_i).month, (Date.today + @extend.to_i).day]).to_i end %>
 var jsdata = [];
-<% @performances.each do |d| %>
-jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%>", <%=(@theta != nil) ? @theta[0] + (d[:rating].to_i * @theta[1]) + ((date_int(d[:date]) - date_int(dmin)) * @theta[2]) : 0%>]);
-<% end %>
-console.log(jsdata);
 
-<% if @theta != nil then %>$("#text").html("<%=@theta[0]%> + <%=@theta[1]%>(rating) + <%=@theta[2]%>(day)");<% else %> $("#text").hide(); <% end %>
+<% @performances.each do |d| %>
+jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%>"]);
+<% end %>
+
+var perf_data = [];
+var rate_data = []
+<% date = dmin %>
+<% while (date < dmax) do %>
+perf_data.push([<%= date.to_s %>, <%=@perfLinReg.result([Math.log(date_int(date) - date_int(dmin) + 1), Math.log(date_int(date) - date_int(dmin) + 1)**2])%>]);
+rate_data.push([<%= date.to_s %>, <%=@rateLinReg.result([Math.log(date_int(date) - date_int(dmin) + 1), Math.log(date_int(date) - date_int(dmin) + 1)**2])%>]);
+<% date = date.to_s %>
+<% newTime = (Date.new(date.to_s[0, 4].to_i, date.to_s[4, 2].to_i, date.to_s[6, 2].to_i) + 5) %>
+<% date = "%04d%02d%02d" % [newTime.year, newTime.month, newTime.day] %>
+<% date = date.to_i %>
+<% end %>
+console.log(perf_data);
+console.log(rate_data);
+var perf_theta = [<%= @perfLinReg.theta[0, 0] %>, <%= @perfLinReg.theta[1, 0] %>, <%= @perfLinReg.theta[2, 0] %>]
+var rate_theta = [<%= @rateLinReg.theta[0, 0] %>, <%= @rateLinReg.theta[1, 0] %>, <%= @rateLinReg.theta[2, 0] %>]
+console.log(perf_theta);
 
 var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
 
@@ -51,6 +65,27 @@ svg.append("g").attr("class","y axis").call(yAxis).attr("transform","translate(6
 		
 svg.selectAll(".x.axis").call(xAxis);
 svg.selectAll(".y.axis").call(yAxis);
+
+var perflrline = d3.svg.line()
+    .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
+						min = (+format.parse("<%=dmin%>"))/1000;
+						n   = +format.parse(d[0].toString())/1000;
+						return (800 / (max - min)) * (n - min) + 60
+					})
+	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 18;})
+	.interpolate("linear");
+var perflrpath = svg.append("svg:path").attr("d", perflrline(perf_data)).style("stroke", "green").style("stroke-width", 3).style("fill", "none");
+
+var ratelrline = d3.svg.line()
+    .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
+						min = (+format.parse("<%=dmin%>"))/1000;
+						n   = +format.parse(d[0].toString())/1000;
+						return (800 / (max - min)) * (n - min) + 60
+					})
+	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 18;})
+	.interpolate("linear");
+var ratelrpath = svg.append("svg:path").attr("d", ratelrline(rate_data)).style("stroke", "yellow").style("stroke-width", 3).style("fill", "none");
+
 var perfline = d3.svg.line()
     .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
 						min = (+format.parse("<%=dmin%>"))/1000;
@@ -125,15 +160,3 @@ buttonText = svg.append("text").attr("transform", "translate(10, 20)").style("fi
 	.on("mouseover", function(){d3.select("rect").style("fill", "#DD9999")})
 	.on("mouseout", function(){d3.select("rect").style("fill", "#DDDDDD")});;
 buttonText.text("Grid");
-	
-<% if (@theta) %>
-var mlline = d3.svg.line()
-    .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
-						min = (+format.parse("<%=dmin%>"))/1000;
-						n   = +format.parse(d[0].toString())/1000;
-						return (800 / (max - min)) * (n - min) + 60
-					})
-	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[4] - <%= ymin %>)) + 18;})
-	.interpolate("linear");
-var mlpath = svg.append("svg:path").attr("d", mlline(jsdata)).style("stroke", "green").style("stroke-width", 3).style("fill", "none");
-<% end %>
