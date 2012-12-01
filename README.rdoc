@@ -126,3 +126,9 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
 10/24:
  -Made some more cosmetic changes
  -Updating routing a bit
+10/25 - 11/29:
+ -Took a month-long break to work on foreign policy and public speaking for the U. Penn Model U.N. conference, visit Amelia, etc.
+11/30:
+ -Build a logistic regression class that implements a basic logistic regression algorithm.
+ -Added two logistic regression classifiers to the deltas page
+ -Predict what rating difference marks the point where a player has a better chance of winning/drawing by rating.

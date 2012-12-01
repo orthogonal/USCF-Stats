@@ -1,5 +1,6 @@
 class DeltasController < ApplicationController
   require 'UscfWebsite'
+  require 'LogisticRegression'
   def index
     render(:action => "index")
   end
@@ -37,6 +38,31 @@ class DeltasController < ApplicationController
   def build_chart
     @data = params[:results].to_hash.map{|key, value| value}
     @data.map!{|record| record.symbolize_keys}
+    
+    # Build Logistic Regression input data
+    x = Array.new
+    win_y = Array.new
+    draw_y = Array.new
+    for i in 0...@data.length do
+      x[i] = Array.new
+      win_y[i] = Array.new
+      draw_y[i] = Array.new
+      x[i][0] = @data[i][:rating].to_i
+      x[i][1] = @data[i][:delta].to_i
+      win_y[i][0] = (@data[i][:wdl] == "W") ? 1 : 0
+      draw_y[i][0] = (@data[i][:wdl] == "L") ? 0 : 1
+    end
+    
+    # Train two logistic regression classifiers
+    @winLogReg = LogisticRegression.new
+    @winLogReg.training_data[:x] = x.clone
+    @winLogReg.training_data[:y] = win_y
+    @winLogReg.train
+    @drawLogReg = LogisticRegression.new
+    @drawLogReg.training_data[:x] = x.clone
+    @drawLogReg.training_data[:y] = draw_y
+    @drawLogReg.train
+    
     respond_to do |format|
       format.js {}
     end

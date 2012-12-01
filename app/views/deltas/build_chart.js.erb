@@ -5,7 +5,6 @@
 <% @data.sort_by!{|d| d[:rating].to_i} %>
 jsdata = [];
 <% @data.each do |d| %>
-<% puts d %>
 jsdata.push(["<%=d[:wdl]%>", <%=d[:rating]%>, <%=d[:delta]%>, "<%=d[:name]%>"]);
 <% end %>
 y = d3.scale.linear().domain([<%=(dmax == dmin) ? dmax + 40 : dmax%>, <%=(dmax == dmin) ? dmin - 40 : dmin%>]).range([0, 600]);
@@ -15,6 +14,46 @@ var yAxis = d3.svg.axis().orient("left").scale(y).ticks(15);
 var xpos = ( ( (600 / (<%= dmax - dmin %>) ) * <%= dmax %> ) + 18);
 svg.append("g").attr("class","x axis").call(xAxis).attr("transform","translate(60, " + ((xpos > 614) ? 614 : xpos) + ")");
 svg.append("g").attr("class","y axis").call(yAxis).attr("transform","translate(60, 20)");
+
+/* Use the logistic regression classifiers trained earlier to predict boundaries for win/no-win and loss/no-loss by rating */
+windata = [];
+<% rating = rmin 			%>
+<% while rating < rmax do 	%>
+<%	delta = -500 			%>
+<%	y = 1					%>
+<%	while delta < 500 && y == 1 do   			%>
+<%		delta += 10								%>
+<%		y = @winLogReg.result([rating, delta])	%>
+<%	end 										%>
+windata.push([<%= rating %>, <%= delta %>]);
+<% rating += 10 %>
+<% end %>
+
+drawdata = [];
+<% rating = rmin 			%>
+<% while rating < rmax do 	%>
+<%	delta = -500 			%>
+<%	y = 1					%>
+<%	while delta < 500 && y == 1 do   			%>
+<%		delta += 10								%>
+<%		y = @drawLogReg.result([rating, delta])	%>
+<%	end 										%>
+drawdata.push([<%= rating %>, <%= delta %>]);
+<% rating += 10 %>
+<% end %>
+
+/* Draw the lines based on those results */
+var winline = d3.svg.line()
+    .x(function(d) {return ((800 / (<%= rmax - rmin %>)) * (d[0] - <%=rmin%>) + 60)})
+	.y(function(d) {return 600 - ((600 / (<%= dmax - dmin %>)) * (d[1] - <%= dmin %>)) + 20;})
+	.interpolate("linear");
+var winpath = svg.append("svg:path").attr("d", winline(windata)).style("stroke", "green").style("stroke-width", 3).style("fill", "none");
+
+var drawline = d3.svg.line()
+    .x(function(d) {return ((800 / (<%= rmax - rmin %>)) * (d[0] - <%=rmin%>) + 60)})
+	.y(function(d) {return 600 - ((600 / (<%= dmax - dmin %>)) * (d[1] - <%= dmin %>)) + 20;})
+	.interpolate("linear");
+var drawpath = svg.append("svg:path").attr("d", drawline(drawdata)).style("stroke", "blue").style("stroke-width", 3).style("fill", "none");
 
 svg.selectAll("circle")
 	.data(jsdata)
