@@ -13,6 +13,7 @@ end %>
 <% ymax = [rmax, pmax].max %>
 <% @performances.sort_by!{|d| d[:date]} %>
 var mindate = <%=date_int(dmin)%>
+$("#text").hide();
 $("#scatterplot").show();
 $("#curvy").show();
 $("#pred_performance").show();
@@ -74,7 +75,7 @@ var perflrline = d3.svg.line()
 					})
 	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 18;})
 	.interpolate("linear");
-var perflrpath = svg.append("svg:path").attr("d", perflrline(perf_data)).style("stroke", "green").style("stroke-width", 3).style("fill", "none");
+var perflrpath = svg.append("svg:path").attr("d", perflrline(perf_data)).style("stroke", "#8AC2E6").style("stroke-width", 3).style("fill", "none");
 
 var ratelrline = d3.svg.line()
     .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
@@ -84,7 +85,7 @@ var ratelrline = d3.svg.line()
 					})
 	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 18;})
 	.interpolate("linear");
-var ratelrpath = svg.append("svg:path").attr("d", ratelrline(rate_data)).style("stroke", "yellow").style("stroke-width", 3).style("fill", "none");
+var ratelrpath = svg.append("svg:path").attr("d", ratelrline(rate_data)).style("stroke", "#B86969").style("stroke-width", 3).style("fill", "none");
 
 var perfline = d3.svg.line()
     .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
