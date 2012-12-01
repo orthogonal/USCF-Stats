@@ -127,7 +127,9 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Made some more cosmetic changes
  -Updating routing a bit
 10/25 - 11/29:
- -Took a month-long break to work on foreign policy and public speaking for the U. Penn Model U.N. conference, visit Amelia, etc.
+ -Took a month-long break
+ -Studied public speaking and developed foreign policy ideas for the U. Penn Model U.N. conference
+ -Visited Amelia in Massachusetts
 11/30:
  -Build a logistic regression class that implements a basic logistic regression algorithm.
  -Added two logistic regression classifiers to the deltas page
