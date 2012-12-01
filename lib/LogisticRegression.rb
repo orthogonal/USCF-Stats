@@ -19,7 +19,7 @@ class LogisticRegression
     y = Matrix.rows(training_data[:y])
     self.m = training_data[:x].length
     self.numFeatures = x.column_size
-    self.theta = Matrix.zero(numFeatures, 1)
+    self.theta = Matrix.build(numFeatures, 1){|row, col| 0}
     gradient_descent()      # Now that everything is initialized, run gradient descent.
   end
   
