@@ -60,8 +60,7 @@ $("#delta").submit(function(){
 						j++
 						$("#text").html("Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />Tournament: " + j + "/" + numTournaments);
 						if (j == numTournaments){
-							$("#inputArea").hide();
-							$("#scatterplot").show();
+							$("#text").html("Running logistic regression algorithms...")
 							$.ajax({
 								type : 'POST',
 								url : '/build_chart',

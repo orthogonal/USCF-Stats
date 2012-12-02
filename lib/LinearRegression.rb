@@ -52,10 +52,9 @@ class LinearRegression
   def gradient_descent()
     oldJ = 99999    # Big enough that the learning rate won't get diminished on the first run      
     newJ = J()
-    alpha = 1.0     # Learning rate
+    alpha = 0.1    # Learning rate
     run = 0
     maxRun = 100
-    puts "X: #{training_data[:x].inspect}  Y: #{training_data[:y].inspect}"
     while (run < maxRun) do
       tmpTheta = Array.new
       for j in 0...numFeatures do
@@ -73,8 +72,8 @@ class LinearRegression
       if (run == maxRun && (oldJ - newJ > 0.001)) then maxRun += 20 end   # Do 20 more if the error is still going down a fair amount.
       if (oldJ < newJ)
         alpha /= 10
+        puts "ALPHA: #{alpha}, RUN: #{run}, J: #{newJ}, Theta: #{theta.inspect}"
       end
-      puts "ALPHA: #{alpha}, RUN: #{run}, J: #{newJ}, Theta: #{theta.inspect}"
     end
   end
   
@@ -97,6 +96,8 @@ class LinearRegression
     x = Matrix.rows(self.training_data[:x].map{|row| [1] + row})
     y = Matrix.rows(self.training_data[:y])
     
+    if !((x.transpose * x).regular?) then return false end      # If the matrix is singular, use gradient descent instead
     self.theta = (x.transpose * x).inverse * x.transpose * y   # TODO:  Use pseudoinverse
+    return true
   end
 end

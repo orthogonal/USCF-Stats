@@ -51,7 +51,7 @@ class PerformanceController < ApplicationController
       x[i] = Array.new
       perf_y[i] = Array.new
       rate_y[i] = Array.new
-      x[i][0] = Math.log(date_int(@performances[i][:date]) - date_int(mindate) + 1)
+      x[i][0] = Math.log(date_int(@performances[i][:date]) - date_int(mindate) + 1.1)   # +1.1 to avoid log(0) = DNE or log(1) = 0
       x[i][1] = x[i][0]**2
       perf_y[i][0] = @performances[i][:performance].to_i
       rate_y[i][0] = @performances[i][:rating].to_i
@@ -60,12 +60,22 @@ class PerformanceController < ApplicationController
     @perfLinReg = LinearRegression.new
     @perfLinReg.training_data[:x] = x.clone
     @perfLinReg.training_data[:y] = perf_y
-    @perfLinReg.normal_equation
+    if (x.length < 1000 && x.length > 1 && @perfLinReg.normal_equation)   # normal_equation returns false for singular matrices
+    elsif (x.length > 1)
+      @perfLinReg.train
+    else
+      @perfLinReg = nil
+    end
     
     @rateLinReg = LinearRegression.new
     @rateLinReg.training_data[:x] = x.clone
     @rateLinReg.training_data[:y] = rate_y
-    @rateLinReg.normal_equation
+    if (x.length < 1000 && x.length > 1 && @rateLinReg.normal_equation)
+    elsif (x.length > 1)
+      @rateLinReg.train
+    else
+      @rateLinReg = nil
+    end
     
     respond_to do |format|
        format.js {}

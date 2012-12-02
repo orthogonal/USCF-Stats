@@ -78,6 +78,7 @@ $("#perf").submit(function(){
 						j++
 						$("#text").html("Loading... " + Math.ceil((j / numTournaments) * 100) + "%<br />Tournament: " + j + "/" + numTournaments);
 						if (j == numTournaments){
+							$("#text").html("Running linear regression algorithms...");
 							$.ajax({
 								type : 'POST',
 								url : '/performance_chart',

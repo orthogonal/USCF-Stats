@@ -25,29 +25,23 @@ var jsdata = [];
 jsdata.push([<%=d[:date]%>, <%=d[:performance]%>, <%=d[:rating]%>, "<%=d[:name]%>"]);
 <% end %>
 
-var perf_data = [];
-var rate_data = []
-<% date = dmin %>
-<% while (date < dmax) do %>
-perf_data.push([<%= date.to_s %>, <%=@perfLinReg.result([Math.log(date_int(date) - date_int(dmin) + 1), Math.log(date_int(date) - date_int(dmin) + 1)**2])%>]);
-rate_data.push([<%= date.to_s %>, <%=@rateLinReg.result([Math.log(date_int(date) - date_int(dmin) + 1), Math.log(date_int(date) - date_int(dmin) + 1)**2])%>]);
-<% date = date.to_s %>
-<% newTime = (Date.new(date.to_s[0, 4].to_i, date.to_s[4, 2].to_i, date.to_s[6, 2].to_i) + 5) %>
-<% date = "%04d%02d%02d" % [newTime.year, newTime.month, newTime.day] %>
-<% date = date.to_i %>
+<% if (@perfLinReg != nil) %>
+	var perf_data = [];
+	var rate_data = []
+	<% date = dmin %>
+	<% while (date < dmax) do %>
+		perf_data.push([<%= date.to_s %>, <%=@perfLinReg.result([Math.log(date_int(date) - date_int(dmin) + 1), Math.log(date_int(date) - date_int(dmin) + 1)**2])%>]);
+		rate_data.push([<%= date.to_s %>, <%=@rateLinReg.result([Math.log(date_int(date) - date_int(dmin) + 1), Math.log(date_int(date) - date_int(dmin) + 1)**2])%>]);
+		<% date = date.to_s %>
+		<% newTime = (Date.new(date.to_s[0, 4].to_i, date.to_s[4, 2].to_i, date.to_s[6, 2].to_i) + 5) %>
+		<% date = "%04d%02d%02d" % [newTime.year, newTime.month, newTime.day] %>
+		<% date = date.to_i %>
+	<% end %>
+	var perf_theta = [<%= @perfLinReg.theta[0, 0] %>, <%= @perfLinReg.theta[1, 0] %>, <%= @perfLinReg.theta[2, 0] %>]
+	var rate_theta = [<%= @rateLinReg.theta[0, 0] %>, <%= @rateLinReg.theta[1, 0] %>, <%= @rateLinReg.theta[2, 0] %>]
 <% end %>
-console.log(perf_data);
-console.log(rate_data);
-var perf_theta = [<%= @perfLinReg.theta[0, 0] %>, <%= @perfLinReg.theta[1, 0] %>, <%= @perfLinReg.theta[2, 0] %>]
-var rate_theta = [<%= @rateLinReg.theta[0, 0] %>, <%= @rateLinReg.theta[1, 0] %>, <%= @rateLinReg.theta[2, 0] %>]
-console.log(perf_theta);
 
 var svg = d3.select("#scatterplot").append("svg").attr("width", "100%").attr("height", "100%");
-
-info1 = svg.append("text").attr("transform", "translate(70, 40)").style("fill", "white");
-info2 = svg.append("text").attr("transform", "translate(70, 55)").style("fill", "white");
-info3 = svg.append("text").attr("transform", "translate(70, 70)").style("fill", "white");
-info4 = svg.append("text").attr("transform", "translate(70, 85)").style("fill", "white");
 
 var format = d3.time.format("%Y%m%d");
 
@@ -67,6 +61,7 @@ svg.append("g").attr("class","y axis").call(yAxis).attr("transform","translate(6
 svg.selectAll(".x.axis").call(xAxis);
 svg.selectAll(".y.axis").call(yAxis);
 
+<% if (@perfLinReg != nil) %>
 var perflrline = d3.svg.line()
     .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
 						min = (+format.parse("<%=dmin%>"))/1000;
@@ -86,6 +81,7 @@ var ratelrline = d3.svg.line()
 	.y(function(d) { return (<%= rmax == rmin %>) ? 300 : 600 - ((600 / (<%= ymax - ymin %>)) * (d[1] - <%= ymin %>)) + 18;})
 	.interpolate("linear");
 var ratelrpath = svg.append("svg:path").attr("d", ratelrline(rate_data)).style("stroke", "#B86969").style("stroke-width", 3).style("fill", "none");
+<% end %>
 
 var perfline = d3.svg.line()
     .x(function(d) { 	max = (+format.parse("<%=dmax%>"))/1000;
@@ -152,6 +148,11 @@ svg.selectAll("circleTwo")
 	.attr("r", 5).style("fill", "#2222FF")
 	.style("stroke", "#000055").style("stroke-width", 2);
 	
+info1 = svg.append("text").attr("transform", "translate(70, 40)").style("fill", "white");
+info2 = svg.append("text").attr("transform", "translate(70, 55)").style("fill", "white");
+info3 = svg.append("text").attr("transform", "translate(70, 70)").style("fill", "white");
+info4 = svg.append("text").attr("transform", "translate(70, 85)").style("fill", "white");
+		
 svg.append("svg:rect").attr("x", 2).attr("y", 1).attr("height", 30).attr("width", 45).style("fill", "#DDDDDD").attr("fill-opacity", 0.9)
 	.on("click", function(){grid()}).style("cursor", "pointer")
 	.on("mouseover", function(){d3.select(this).style("fill", "#DD9999")})
