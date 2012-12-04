@@ -138,3 +138,9 @@ I am hoping to apply these same ideas and experiences to build an app that a lot
  -Built a linear regression class to implement a basic linear regression algorithm
  -Added two linear regression lines, with features log(rating) and log^2(rating), to the performances page.
  -Made various parts of the website work better and look better.
+12/2:
+ -Found a problem with the logistic regression classifier.
+ -Spent a while exploring various solutions, couldn't find a consistent one, asked a question on StackOverflow.
+ -Made a lot of cosmetic changes to the site.
+12/3:
+ -Updated what the description says on the homepage.
