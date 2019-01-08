@@ -112,7 +112,7 @@ class UscfWebsite
       end
       
       quickBlocks.each do |block|
-        if (block.text.include?("=>") && ratings[:quick] == 0)
+        if (block.text.include?("=>") && ratings[:quick] == 0 && !(block.text.include?("ONL:")))
           ratings[:quick] = block.text[block.text.index("=>") + 2, block.text.length].strip.to_i
           break
         end
